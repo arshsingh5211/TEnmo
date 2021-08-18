@@ -1,6 +1,5 @@
 package com.techelevator.tenmo.services;
 
-import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Balance;
 import org.springframework.http.HttpEntity;
@@ -23,23 +22,15 @@ public class AccountService {
         BASE_URL = url;
     }
 
-    /*
-    - Tried to make this work instead of putting it in the app class, but kept getting NPE and custom exception
-    - Also changed Balance to Account in jdbc but didn't change it here to make sure that's what we want first
-    - so far the only thing that works is what andy did in class
-    - so feel free to change anything you want
-     */
-
-    public BigDecimal getBalance() {
-        BigDecimal balance = new BigDecimal("0");
+    public void getBalance() {
+        BigDecimal balance = null;
         try {
             balance = restTemplate.exchange(BASE_URL + "balance/" + currentUser.getUser().getId(), HttpMethod.GET, makeAuthEntity(), BigDecimal.class).getBody();
-            System.out.println("Your current balance is " + NumberFormat.getCurrencyInstance().format(balance));
+            System.out.println("Your current balance is " + NumberFormat.getCurrencyInstance().format(balance)); // it's TE bucks not USD, get rid of this?
         } catch (RestClientResponseException ex) {
             ex.getRawStatusCode();
             // fix the message later
         }
-        return balance;
     }
 
     private HttpEntity<Balance> makeBalanceEntity(Balance balance) {
