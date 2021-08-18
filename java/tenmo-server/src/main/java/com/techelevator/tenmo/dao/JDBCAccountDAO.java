@@ -1,7 +1,8 @@
 package com.techelevator.tenmo.dao;
 
-import com.techelevator.tenmo.model.Balance;
+import com.techelevator.tenmo.model.Account;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 import java.math.BigDecimal;
@@ -16,11 +17,22 @@ public class JDBCAccountDAO implements AccountDAO {
     }
 
     @Override
-    public Balance getBalance(String user) { // or we can use userId too (probably better?)
-        Balance balance = new Balance();
+    public Account getAccount(String user) { // or we can use userId too (probably better?)
+        Account account = new Account();
+        String query = "SELECT balance FROM accounts WHERE (SELECT user_id FROM accounts " +
+                "JOIN users USING (user_id) WHERE userName = ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(query, user);
+        while ((results.next())) {
+            account = mapRowToAccount(results);
+        }
+        return account;
+    }
 
-        //queryforrowset and mapToRowSet stuff
-        balance.setBalance(new BigDecimal("200")); // just hardcoding an example here
-        return balance;
+    private Account mapRowToAccount(SqlRowSet rowSet) {
+        Account account = new Account();
+        account.setAccountId(rowSet.getLong("account_id"));
+        account.setUserId(rowSet.getLong("user_id"));
+        account.setBalance(rowSet.getBigDecimal("balance"));
+        return account;
     }
 }

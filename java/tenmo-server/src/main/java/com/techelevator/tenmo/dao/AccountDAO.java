@@ -1,7 +1,7 @@
 package com.techelevator.tenmo.dao;
 
-import com.techelevator.tenmo.model.Balance;
+import com.techelevator.tenmo.model.Account;
 
 public interface AccountDAO {
-    Balance getBalance(String user);
+    Account getAccount(String user);
 }

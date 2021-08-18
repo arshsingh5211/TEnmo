@@ -2,8 +2,8 @@ package com.techelevator.tenmo.model;
 
 import java.math.BigDecimal;
 
-public class Balance {
-    BigDecimal balance;
+public class Account {
+    private BigDecimal balance;
 
     public BigDecimal getBalance() {
         return balance;

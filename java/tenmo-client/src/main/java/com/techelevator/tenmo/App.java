@@ -1,10 +1,16 @@
 package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Balance;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.AuthenticationServiceException;
+import com.techelevator.tenmo.services.BalanceService;
 import com.techelevator.view.ConsoleService;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.web.client.RestTemplate;
 
 public class App {
 
@@ -25,15 +31,19 @@ private static final String API_BASE_URL = "http://localhost:8080/";
     private AuthenticatedUser currentUser;
     private ConsoleService console;
     private AuthenticationService authenticationService;
+    private RestTemplate restTemplate;
+    private BalanceService balanceService;
 
     public static void main(String[] args) {
-    	App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL));
+    	App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL), new RestTemplate(), new BalanceService());
     	app.run();
     }
 
-    public App(ConsoleService console, AuthenticationService authenticationService) {
+	public App(ConsoleService console, AuthenticationService authenticationService, RestTemplate restTemplate, BalanceService balanceService) {
 		this.console = console;
 		this.authenticationService = authenticationService;
+		this.restTemplate = restTemplate;
+		this.balanceService = balanceService;
 	}
 
 	public void run() {
@@ -67,9 +77,16 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		}
 	}
 
+	// move this to account service class (also I think I missed a step here)
 	private void viewCurrentBalance() {
 		// TODO Auto-generated method stub
-		
+		System.out.println(currentUser.getToken());
+
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.setBearerAuth(currentUser.getToken());
+		HttpEntity entity = new HttpEntity(httpHeaders);
+
+		restTemplate.exchange("http://localhost:8080/balance", HttpMethod.GET, entity, Balance.class).getBody();
 	}
 
 	private void viewTransferHistory() {
