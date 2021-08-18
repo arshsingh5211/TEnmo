@@ -35,15 +35,13 @@ private static final String API_BASE_URL = "http://localhost:8080/";
     private AccountService accountService;
 
     public static void main(String[] args) {
-    	App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL), new RestTemplate(), new AccountService());
+    	App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL));
     	app.run();
     }
 
-	public App(ConsoleService console, AuthenticationService authenticationService, RestTemplate restTemplate, AccountService accountService) {
+	public App(ConsoleService console, AuthenticationService authenticationService) {
 		this.console = console;
 		this.authenticationService = authenticationService;
-		this.restTemplate = restTemplate;
-		this.accountService = accountService;
 	}
 
 	public void run() {
@@ -59,11 +57,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		while(true) {
 			String choice = (String)console.getChoiceFromOptions(MAIN_MENU_OPTIONS);
 			if(MAIN_MENU_OPTION_VIEW_BALANCE.equals(choice)) {
-				try {
-					accountService.viewCurrentBalance();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				viewCurrentBalance();
 			} else if(MAIN_MENU_OPTION_VIEW_PAST_TRANSFERS.equals(choice)) {
 				viewTransferHistory();
 			} else if(MAIN_MENU_OPTION_VIEW_PENDING_REQUESTS.equals(choice)) {
@@ -81,16 +75,22 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		}
 	}
 
-	// move this to account service class (also I think I missed a step here)
 	private void viewCurrentBalance() {
-		// TODO Auto-generated method stub
+    	AccountService accountService = new AccountService(currentUser, API_BASE_URL);
+    	try {
+    		accountService.getBalance();
+		}
+    	catch (Exception e) {
+    		e.printStackTrace();
+		}
+		/*// TODO Auto-generated method stub
 		System.out.println(currentUser.getToken());
 
 		HttpHeaders httpHeaders = new HttpHeaders();
 		httpHeaders.setBearerAuth(currentUser.getToken());
 		HttpEntity entity = new HttpEntity(httpHeaders);
 
-		restTemplate.exchange("http://localhost:8080/balance", HttpMethod.GET, entity, Balance.class).getBody();
+		restTemplate.exchange("http://localhost:8080/balance", HttpMethod.GET, entity, Balance.class).getBody();*/
 	}
 
 	private void viewTransferHistory() {

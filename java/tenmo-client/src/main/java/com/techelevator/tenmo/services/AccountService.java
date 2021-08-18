@@ -10,12 +10,18 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+
 public class AccountService {
-    public static String AUTH_TOKEN = "";
-    public static final String BASE_URL = "http://localhost:8080";
+    private String BASE_URL;
     private AuthenticatedUser currentUser;
-    private AuthenticationService authenticationService;
     private RestTemplate restTemplate = new RestTemplate();
+
+    public AccountService(AuthenticatedUser currentUser, String url) {
+        this.currentUser = currentUser;
+        BASE_URL = url;
+    }
 
     /*
     - Tried to make this work instead of putting it in the app class, but kept getting NPE and custom exception
@@ -24,15 +30,16 @@ public class AccountService {
     - so feel free to change anything you want
      */
 
-    public Account viewCurrentBalance() throws Exception {
-        Account account = null;
+    public BigDecimal getBalance() {
+        BigDecimal balance = new BigDecimal("0");
         try {
-            account = restTemplate.exchange(BASE_URL + "/balance", HttpMethod.GET, makeAuthEntity(), Account.class).getBody();
+            balance = restTemplate.exchange(BASE_URL + "balance/" + currentUser.getUser().getId(), HttpMethod.GET, makeAuthEntity(), BigDecimal.class).getBody();
+            System.out.println("Your current balance is " + NumberFormat.getCurrencyInstance().format(balance));
         } catch (RestClientResponseException ex) {
-            throw new BalanceServiceException(String.valueOf(ex.getRawStatusCode())); // lacks authentication
+            ex.getRawStatusCode();
             // fix the message later
         }
-        return account;
+        return balance;
     }
 
     private HttpEntity<Balance> makeBalanceEntity(Balance balance) {
@@ -45,7 +52,7 @@ public class AccountService {
 
     private HttpEntity makeAuthEntity() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(AUTH_TOKEN);
+        headers.setBearerAuth(currentUser.getToken());
         HttpEntity entity = new HttpEntity<>(headers);
         return entity;
     }
