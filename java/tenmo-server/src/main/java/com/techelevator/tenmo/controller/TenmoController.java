@@ -18,9 +18,10 @@ public class TenmoController {
     @Autowired
     AccountDAO dao;
 
+    @PreAuthorize("permitAll") // CHANGE THIS LATER
     @RequestMapping(path = "/balance", method = RequestMethod.GET)
-    public Account getBalance(Principal principal) {
+    public Account getAccount(Principal principal) {
         System.out.println(principal.getName());
-        return dao.getBalance(principal.getName());
+        return dao.getAccount(principal.getName());
     }
 }

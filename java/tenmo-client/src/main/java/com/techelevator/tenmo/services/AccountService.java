@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
-public class BalanceService {
+public class AccountService {
     public static String AUTH_TOKEN = "";
     public static final String BASE_URL = "http://localhost:8080";
     private AuthenticatedUser currentUser;
@@ -24,18 +24,21 @@ public class BalanceService {
     - so feel free to change anything you want
      */
 
-    public void viewCurrentBalance() throws Exception {
+    public Account viewCurrentBalance() throws Exception {
+        Account account = null;
         try {
-            restTemplate.exchange(BASE_URL + "/balance", HttpMethod.GET, makeAuthEntity(), Balance.class).getBody();
+            account = restTemplate.exchange(BASE_URL + "/balance", HttpMethod.GET, makeAuthEntity(), Account.class).getBody();
         } catch (RestClientResponseException ex) {
-            throw new BalanceServiceException("Exception here"); // fix message later
+            throw new BalanceServiceException(String.valueOf(ex.getRawStatusCode())); // lacks authentication
+            // fix the message later
         }
+        return account;
     }
 
     private HttpEntity<Balance> makeBalanceEntity(Balance balance) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON); // idk what this does?
-        headers.setBearerAuth(AUTH_TOKEN);
+        headers.setBearerAuth(currentUser.getToken());
         HttpEntity<Balance> entity = new HttpEntity<>(balance, headers);
         return entity;
     }

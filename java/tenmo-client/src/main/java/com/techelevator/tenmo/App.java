@@ -5,7 +5,7 @@ import com.techelevator.tenmo.model.Balance;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.AuthenticationServiceException;
-import com.techelevator.tenmo.services.BalanceService;
+import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.view.ConsoleService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpEntity;
@@ -32,18 +32,18 @@ private static final String API_BASE_URL = "http://localhost:8080/";
     private ConsoleService console;
     private AuthenticationService authenticationService;
     private RestTemplate restTemplate;
-    private BalanceService balanceService;
+    private AccountService accountService;
 
     public static void main(String[] args) {
-    	App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL), new RestTemplate(), new BalanceService());
+    	App app = new App(new ConsoleService(System.in, System.out), new AuthenticationService(API_BASE_URL), new RestTemplate(), new AccountService());
     	app.run();
     }
 
-	public App(ConsoleService console, AuthenticationService authenticationService, RestTemplate restTemplate, BalanceService balanceService) {
+	public App(ConsoleService console, AuthenticationService authenticationService, RestTemplate restTemplate, AccountService accountService) {
 		this.console = console;
 		this.authenticationService = authenticationService;
 		this.restTemplate = restTemplate;
-		this.balanceService = balanceService;
+		this.accountService = accountService;
 	}
 
 	public void run() {
@@ -59,7 +59,11 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		while(true) {
 			String choice = (String)console.getChoiceFromOptions(MAIN_MENU_OPTIONS);
 			if(MAIN_MENU_OPTION_VIEW_BALANCE.equals(choice)) {
-				viewCurrentBalance();
+				try {
+					accountService.viewCurrentBalance();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			} else if(MAIN_MENU_OPTION_VIEW_PAST_TRANSFERS.equals(choice)) {
 				viewTransferHistory();
 			} else if(MAIN_MENU_OPTION_VIEW_PENDING_REQUESTS.equals(choice)) {

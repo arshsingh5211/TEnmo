@@ -17,9 +17,21 @@ public class JDBCAccountDAO implements AccountDAO {
     }
 
     @Override
-    public Account getAccount(String user) { // or we can use userId too (probably better?)
+    public BigDecimal getBalance (String user) {
         Account account = new Account();
         String query = "SELECT balance FROM accounts WHERE (SELECT user_id FROM accounts " +
+                "JOIN users USING (user_id) WHERE userName = ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(query, user);
+        while ((results.next())) {
+            account = mapRowToAccount(results);
+        }
+        return account.getBalance();
+    }
+
+    @Override
+    public Account getAccount(String user) { // or we can use userId too (probably better?)
+        Account account = new Account();
+        String query = "SELECT * FROM accounts WHERE (SELECT user_id FROM accounts " +
                 "JOIN users USING (user_id) WHERE userName = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(query, user);
         while ((results.next())) {
