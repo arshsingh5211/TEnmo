@@ -2,6 +2,7 @@ package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.Balance;
+import com.techelevator.tenmo.model.User;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,13 +12,15 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AccountService {
     private String BASE_URL;
     private AuthenticatedUser currentUser;
     private RestTemplate restTemplate = new RestTemplate();
 
-    public AccountService(AuthenticatedUser currentUser, String url) {
+    public AccountService(String url, AuthenticatedUser currentUser) {
         this.currentUser = currentUser;
         BASE_URL = url;
     }
@@ -33,7 +36,19 @@ public class AccountService {
         }
         return balance;
     }
+    public User[] getUsers() {
+        User[] userList = null;
+        userList = restTemplate.exchange(BASE_URL + "users", HttpMethod.GET, makeAuthEntity(), User[].class).getBody();
+        return userList;
 
+    }
+
+    public User getUserByUsername(String username) {
+        User user = null;
+        user = restTemplate.exchange(BASE_URL + "users/" + username, HttpMethod.GET, makeAuthEntity(), User.class).getBody();
+        return user;
+
+    }
     private HttpEntity<Balance> makeBalanceEntity(Balance balance) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON); // idk what this does?

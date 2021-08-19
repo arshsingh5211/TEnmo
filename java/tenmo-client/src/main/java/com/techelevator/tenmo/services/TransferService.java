@@ -24,9 +24,8 @@ public class TransferService {
     }
 
     public Transfer sendTransfer(String newTransfer) {
-        // first verify user has sufficient funds
 
-        Transfer transfer = null; //makeTransfer(csv) method needed?
+        Transfer transfer = makeTransferObject(newTransfer); //makeTransfer(csv) method needed?
         if (transfer == null) {
             return null;
         }
@@ -50,6 +49,12 @@ public class TransferService {
     }
 
     private Transfer makeTransferObject(String csv) {
+        long transferId;
+        long transferTypeId;
+        long transferStatusId;
+        long accountFrom;
+        long accountTo;
+        BigDecimal amount;
         // {"recipient", 100.00}
         String[] parsed = csv.split(",".toLowerCase());
 
@@ -67,11 +72,20 @@ public class TransferService {
         }
 
         // verify sufficient balance
-        accountService = new AccountService(currentUser, BASE_URL);
+        accountService = new AccountService(BASE_URL, currentUser);
         BigDecimal currentBalance = accountService.getBalance();
 
+        amount = new BigDecimal(parsed[2]);
+        accountFrom = currentUser.getUser().getId();
+        accountTo = accountService.getUserByUsername(parsed[1]).getId();
+        transferId = new Random().nextInt(1000);
+        transferStatusId = new Random().nextInt(1000);
         return new Transfer(
 
         );
+    }
+
+    public void createTransferStatus(long id, String status) {
+        restTemplate.(BASE_URL + "/transfer_statuses", )
     }
 }

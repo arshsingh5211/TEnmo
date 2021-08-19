@@ -1,6 +1,8 @@
 package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.AuthenticationServiceException;
@@ -74,7 +76,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	}
 
 	private void viewCurrentBalance() {
-    	AccountService accountService = new AccountService(currentUser, API_BASE_URL);
+    	accountService = new AccountService(API_BASE_URL, currentUser);
     	try {
     		accountService.getBalance();
 		}
@@ -94,7 +96,17 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	}
 
 	private void sendBucks() {
-		TransferService transferService = new TransferService(API_BASE_URL, currentUser);
+		transferService = new TransferService(API_BASE_URL, currentUser);
+		accountService = new AccountService(API_BASE_URL, currentUser);
+
+		int counter = 1;
+		for (User user : accountService.getUsers()) {
+			System.out.println(counter + ") " + user.getUsername());
+			counter++;
+		}
+
+		String transferData = console.promptForTransfer();
+		Transfer transfer = transferService.sendTransfer(transferData);
 		try {
 			//transferService.sendTransfer();
 		}

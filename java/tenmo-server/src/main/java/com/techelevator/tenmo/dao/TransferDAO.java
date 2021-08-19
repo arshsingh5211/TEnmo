@@ -17,4 +17,5 @@ public interface TransferDAO {
     List<Transfer> listAllTransfersSent();
     List<Transfer> searchAllTransfersById(); // current user plus whatever id we pass in (interactions)
     List<Transfer> listAllTransfersReceived();
+    void createTransferStatus(long id, String status);
 }
