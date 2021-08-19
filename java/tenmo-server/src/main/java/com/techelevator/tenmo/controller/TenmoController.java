@@ -40,6 +40,6 @@ public class TenmoController {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "/transfer", method = RequestMethod.POST)
     public Transfer createTransfer(@Valid @RequestBody Transfer transfer) {
-        return transferDAO.sendTransfer(transfer);
+        return transferDAO.createTransfer(transfer);
     }
 }

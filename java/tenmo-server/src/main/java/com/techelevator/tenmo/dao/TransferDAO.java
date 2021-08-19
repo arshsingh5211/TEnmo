@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface TransferDAO {
     Transfer getTransfer(long transferId);
-    Transfer sendTransfer(Transfer transfer);
+    Transfer createTransfer(Transfer transfer);
     List<User> getUserList();
     List<Transfer> getTransferList();
     String getTransferStatus();

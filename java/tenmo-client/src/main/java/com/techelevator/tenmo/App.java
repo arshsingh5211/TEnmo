@@ -96,7 +96,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	private void sendBucks() {
 		TransferService transferService = new TransferService(API_BASE_URL, currentUser);
 		try {
-			transferService.sendTransfer();
+			//transferService.sendTransfer();
 		}
 		catch (Exception e) {
 			e.printStackTrace();

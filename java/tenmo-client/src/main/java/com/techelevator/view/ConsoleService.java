@@ -1,6 +1,8 @@
 package com.techelevator.view;
 
 
+import com.techelevator.tenmo.model.Transfer;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -72,5 +74,29 @@ public class ConsoleService {
 			}
 		} while(result == null);
 		return result;
+	}
+
+	public String promptForTransfer() {
+		return promptForTransfer(null);
+	}
+
+	public String promptForTransfer(Transfer transfer) {
+		String transferString;
+		System.out.println("--------------------------------------------");
+		System.out.println("Enter the Tenmo username and amount you wish " +
+				"to transfer separated by a comma:");
+		if (transfer != null) {
+			System.out.println(transfer.toString());
+		} else {
+			System.out.println("Example: JoeShmoe, 25.00");
+		}
+		System.out.println("--------------------------------------------");
+		System.out.println("");
+
+		transferString = in.nextLine();
+		if (transfer != null) {
+			transferString = transfer.getTransferId() + "," + transferString;
+		}
+		return transferString;
 	}
 }

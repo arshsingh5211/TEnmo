@@ -22,7 +22,7 @@ public class AccountService {
         BASE_URL = url;
     }
 
-    public void getBalance() {
+    public BigDecimal getBalance() {
         BigDecimal balance = null;
         try {
             balance = restTemplate.exchange(BASE_URL + "balance/" + currentUser.getUser().getId(), HttpMethod.GET, makeAuthEntity(), BigDecimal.class).getBody();
@@ -31,6 +31,7 @@ public class AccountService {
             ex.getRawStatusCode();
             // fix the message later
         }
+        return balance;
     }
 
     private HttpEntity<Balance> makeBalanceEntity(Balance balance) {

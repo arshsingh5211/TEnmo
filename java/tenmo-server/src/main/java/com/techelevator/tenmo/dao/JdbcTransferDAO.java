@@ -31,7 +31,7 @@ public class JdbcTransferDAO implements TransferDAO {
     }
 
     @Override
-    public Transfer sendTransfer(Transfer transfer) {
+    public Transfer createTransfer(Transfer transfer) {
         String query = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
                 "VALUES (?, ?, ?, ?, ?)";
         Long newTransferId = jdbcTemplate.queryForObject(query, Long.class, transfer.getTransferTypeId(),
