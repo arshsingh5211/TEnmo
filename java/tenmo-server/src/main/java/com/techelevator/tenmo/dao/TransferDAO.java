@@ -13,9 +13,9 @@ public interface TransferDAO {
                         Transfers transfers, long transferStatusId, long transferTypeId);
     List<Transfers> getTransferList();
     String getTransferStatus();
-    public void createTransferType(long id, String type);
+    public void createTransferType(Transfers transfer);
     String getTransferDetails();
     List<Transfers> searchAllTransfersById(); // current user plus whatever id we pass in (interactions)
     List<Transfers> listAllMyTransfers();
-    void createTransferStatus(long id, String status);
+    void createTransferStatus(Transfers transfers);
 }

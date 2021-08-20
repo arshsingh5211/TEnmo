@@ -1,8 +1,6 @@
 package com.techelevator.tenmo.services;
 
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.Balance;
-import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,7 +28,10 @@ public class TransferService {
             return null;
         }
         // need try/catch?
-        return restTemplate.postForObject(BASE_URL + "transfer/", makeTransferEntity(transfer),  Transfer.class);
+        restTemplate.postForObject(BASE_URL + "transfer_statuses", makeTransferTypeObject(transfer), TransferType.class);
+        restTemplate.postForObject(BASE_URL + "transfer_statuses", makeTransferStatusObject(transfer), TransferStatus.class);
+        return restTemplate.postForObject(BASE_URL + "account/" + transfer.getAccountFrom() + "/transfers" + transfer.getAccountTo(),
+                makeTransferEntity(transfer),  Transfer.class);
     }
 
     private HttpEntity<Transfer> makeTransferEntity(Transfer transfer) {
@@ -48,13 +49,23 @@ public class TransferService {
         return entity;
     }
 
+    private TransferStatus makeTransferStatusObject(Transfer transfer) {
+        TransferStatus transferStatus = new TransferStatus();
+        transferStatus.setTransferStatusId(transfer.getTransferStatusId());
+        transferStatus.setTransferStatus("Approved");
+
+        return transferStatus;
+    }
+
+    private TransferType makeTransferTypeObject(Transfer transfer) {
+        TransferType transferType = new TransferType();
+        transferType.setTransferTypeId(transfer.getTransferStatusId());
+        transferType.setTransferType("Type");
+
+        return transferType;
+    }
+
     private Transfer makeTransferObject(String csv) {
-        long transferId;
-        long transferTypeId;
-        long transferStatusId;
-        long accountFrom;
-        long accountTo;
-        BigDecimal amount;
         // {"recipient", 100.00}
         String[] parsed = csv.split(",".toLowerCase());
 
@@ -71,18 +82,22 @@ public class TransferService {
             parsed = withId;
         }
 
-        // verify sufficient balance
-        accountService = new AccountService(BASE_URL, currentUser);
-        BigDecimal currentBalance = accountService.getBalance();
+        BigDecimal amount = new BigDecimal(parsed[2]);
+        long accountFrom = currentUser.getUser().getId();
+        long accountTo = accountService.getUserByUsername(parsed[1]).getId();
+        long transferId = new Random().nextInt(1000);
+        long transferStatusId = new Random().nextInt(1000);
+        long transferTypeId = new Random().nextInt(1000);
 
-        amount = new BigDecimal(parsed[2]);
-        accountFrom = currentUser.getUser().getId();
-        accountTo = accountService.getUserByUsername(parsed[1]).getId();
-        transferId = new Random().nextInt(1000);
-        transferStatusId = new Random().nextInt(1000);
-        return new Transfer(
+        Transfer transfer = new Transfer();
+        transfer.setAmount(amount);
+        transfer.setTransferId(transferId);
+        transfer.setAccountFrom(accountFrom);
+        transfer.setAccountTo(accountTo);
+        transfer.setTransferStatusId(transferStatusId);
+        transfer.setTransferTypeId(transferTypeId);
 
-        );
+        return transfer;
     }
 
     public void createTransferStatus(long id, String status) {

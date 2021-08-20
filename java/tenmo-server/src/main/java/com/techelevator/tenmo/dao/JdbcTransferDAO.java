@@ -69,16 +69,16 @@ public class JdbcTransferDAO implements TransferDAO {
     }
 
     @Override
-    public void createTransferStatus(long id, String status) {
+    public void createTransferStatus(Transfers transfer) {
         String query = "INSERT INTO transfer_statuses(transfer_statuses_id, transfer_statuses_desc)" +
                 "VALUES (?, ?)";
-        jdbcTemplate.update(query, id, status);
+        jdbcTemplate.update(query, transfer.getTransferId(), "Approved");
     }
     @Override
-    public void createTransferType(long id, String type) {
+    public void createTransferType(Transfers transfer) {
         String query = "INSERT INTO transfer_statuses(transfer_statuses_id, transfer_statuses_desc)" +
                 "VALUES (?, ?)";
-        jdbcTemplate.update(query, id, type);
+        jdbcTemplate.update(query, transfer.getTransferTypeId(), "type");
     }
     @Override
     public List<Transfers> getTransferList() {

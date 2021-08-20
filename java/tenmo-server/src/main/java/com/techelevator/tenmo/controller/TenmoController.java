@@ -71,10 +71,14 @@ public class TenmoController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "transfer_statuses", method = RequestMethod.POST)
-    public void createTransferStatus(@RequestBody long id, String status) {
-        transferDAO.createTransferStatus(id, status);
+    public void createTransferStatus(@RequestBody Transfers transfer) {
+        transferDAO.createTransferStatus(transfer);
     }
-
+    @ResponseStatus(HttpStatus.CREATED)
+    @RequestMapping(path = "transfer_types", method = RequestMethod.POST)
+    public void createTransferType(@RequestBody Transfers transfer) {
+        transferDAO.createTransferType(transfer);
+    }
     @PreAuthorize("permitAll()")
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "account/{accountFrom}/transfers/{accountTo}", method = RequestMethod.POST)
