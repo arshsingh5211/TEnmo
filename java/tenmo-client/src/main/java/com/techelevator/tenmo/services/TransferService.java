@@ -28,7 +28,7 @@ public class TransferService {
             return null;
         }
         // need try/catch?
-        restTemplate.postForObject(BASE_URL + "transfer_statuses", makeTransferTypeObject(transfer), TransferType.class);
+        restTemplate.postForObject(BASE_URL + "transfer_types", makeTransferTypeObject(transfer), TransferType.class);
         restTemplate.postForObject(BASE_URL + "transfer_statuses", makeTransferStatusObject(transfer), TransferStatus.class);
         return restTemplate.postForObject(BASE_URL + "account/" + transfer.getAccountFrom() + "/transfers" + transfer.getAccountTo(),
                 makeTransferEntity(transfer),  Transfer.class);

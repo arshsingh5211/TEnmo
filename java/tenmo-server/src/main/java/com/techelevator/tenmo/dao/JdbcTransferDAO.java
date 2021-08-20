@@ -56,6 +56,8 @@ public class JdbcTransferDAO implements TransferDAO {
             return "Balance insufficient! Please add more TEbucks to your account or change transfer amount.";
         }
         else {
+            // will need to join account table on accountTo = user_id and accountFrom = user_id to get thier account numbers and link
+            // account information.
             String query = "BEGIN TRANSACTION; " +
                                 "INSERT INTO transfers (transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
                                 "VALUES (DEFAULT, ?, ?, ?, ?, ?);" +
