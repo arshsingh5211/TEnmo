@@ -9,11 +9,11 @@ import javax.sql.DataSource;
 import java.math.BigDecimal;
 
 @Component
-public class JdbcAccountDao implements AccountDAO {
+public class JDBCAccountDAO implements AccountDAO {
 
     private JdbcTemplate jdbcTemplate;
 
-    public JdbcAccountDao(DataSource ds) {
+    public JDBCAccountDAO(DataSource ds) {
         this.jdbcTemplate = new JdbcTemplate(ds);
     }
 
@@ -26,6 +26,17 @@ public class JdbcAccountDao implements AccountDAO {
             balance = results.getBigDecimal("balance");
         }
         return balance;
+    }
+
+    @Override
+    public Account getAccount (int id) {
+        Account account = null;
+        String query = "SELECT * FROM accounts WHERE user_id = ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(query, id);
+        if ((results.next())) {
+            account = mapRowToAccount(results);
+        }
+        return account;
     }
 
     @Override
@@ -48,17 +59,17 @@ public class JdbcAccountDao implements AccountDAO {
         jdbcTemplate.update(query, id);
     }
 
-   /* @Override
-    public Account getAccount(String user) { // or we can use userId too (probably better?)
+   @Override
+    public Account getAccount(String username) { // or we can use userId too (probably better?)
         Account account = new Account();
         String query = "SELECT * FROM accounts WHERE (SELECT user_id FROM accounts " +
                 "JOIN users USING (user_id) WHERE userName = ?";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(query, user);
+        SqlRowSet results = jdbcTemplate.queryForRowSet(query, username);
         while ((results.next())) {
             account = mapRowToAccount(results);
         }
         return account;
-    }*/
+    }
 
     private Account mapRowToAccount(SqlRowSet rowSet) {
         Account account = new Account();

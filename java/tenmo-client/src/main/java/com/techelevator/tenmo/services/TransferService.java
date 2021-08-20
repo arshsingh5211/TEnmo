@@ -86,6 +86,6 @@ public class TransferService {
     }
 
     public void createTransferStatus(long id, String status) {
-        restTemplate.(BASE_URL + "/transfer_statuses", )
+        //restTemplate.(BASE_URL + "/transfer_statuses", )
     }
 }

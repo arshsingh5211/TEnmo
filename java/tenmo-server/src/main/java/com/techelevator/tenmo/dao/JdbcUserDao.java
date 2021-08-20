@@ -26,11 +26,7 @@ public class JdbcUserDao implements UserDao {
     public int findIdByUsername(String username) {
         String sql = "SELECT user_id FROM users WHERE username ILIKE ?;";
         Integer id = jdbcTemplate.queryForObject(sql, Integer.class, username);
-        if (id != null) {
-            return id;
-        } else {
-            return -1;
-        }
+        return id != null ? id : -1;
     }
 
     @Override

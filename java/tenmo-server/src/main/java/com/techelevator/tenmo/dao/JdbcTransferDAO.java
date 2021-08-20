@@ -1,43 +1,71 @@
 package com.techelevator.tenmo.dao;
 
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.Transfers;
 import com.techelevator.tenmo.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Component
 public class JdbcTransferDAO implements TransferDAO {
+
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public JdbcTransferDAO(DataSource ds) {
+    @Autowired
+    private AccountDAO accountDAO;
+
+    @Autowired
+    private TransferDAO transferDAO;
+
+    /*public JdbcTransferDAO(DataSource ds) {
         this.jdbcTemplate = new JdbcTemplate(ds);
-    }
+    }*/
 
     @Override
-    public Transfer getTransfer(long transferId) {
-        Transfer transfer = new Transfer();
+    public Transfers getTransferById(long transferId) {
+        Transfers transfers = new Transfers();
         String query = "SELECT * FROM transfers WHERE transfer_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(query, transferId);
         while (results.next()) {
-            transfer = mapRowToTransfer(results);
+            transfers = mapRowToTransfer(results);
         }
-        return transfer;
+        return transfers;
     }
 
     @Override
-    public Transfer createTransfer(Transfer transfer) {
+    public Transfers createTransfer(Transfers transfers, int typeId) {
         String query = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                "VALUES (?, ?, ?, ?, ?)";
-        Long newTransferId = jdbcTemplate.queryForObject(query, Long.class, transfer.getTransferTypeId(),
-                transfer.getTransferStatusId(), transfer.getAccountFrom(), transfer.getAccountTo(), transfer.getAmount());
-        return getTransfer(newTransferId);
+                "VALUES (?, ?, ?, ?, ?) RETURNING transfer_id";
+        Long newTransferId = jdbcTemplate.queryForObject(query, Long.class, typeId, 3,
+                transfers.getAccountFrom(), transfers.getAccountTo(), new BigDecimal("999.99"));
+        return getTransferById(newTransferId);
+    }
 
+    @Override
+    public String sendTransfer(int accountFrom, int accountTo, BigDecimal amount, Transfers transfers) {
+        BigDecimal fromAmount = accountDAO.getBalance(accountFrom);
+        BigDecimal toAmount = accountDAO.getBalance(accountTo);
+        if (accountFrom == accountTo) return "You cannot send a transfer to yourself!";
+        if (fromAmount.compareTo(amount) == 1 && amount.compareTo(new BigDecimal("0.00")) == -1) {
+            return "Balance insufficient! Please add more TEbucks to your account or change transfer amount.";
+        }
+        else {
+            String query = "BEGIN TRANSACTION; " +
+                                "INSERT INTO transfers (transfer_id, transfer_type_id, transfer_status_id, account_from, account_to) " +
+                                "VALUES (DEFAULT, ?, ?, ?, ?); " +
+                                "UPDATE accounts SET balance = balance - ? WHERE user_id = ? " +
+                                "UPDATE accounts SET balance = balance + ? WHERE user_id = ?; " +
+                            "COMMIT";
+            jdbcTemplate.update(query, accountFrom, accountTo, amount);
+            accountDAO.addToBalance(accountDAO.getAccount(accountTo), amount);
+            accountDAO.subtractFromBalance(accountDAO.getAccount(accountFrom), amount);
+            return "Transfer successful!"; // show current user's new balance
+        }
     }
 
     @Override
@@ -48,12 +76,7 @@ public class JdbcTransferDAO implements TransferDAO {
     }
 
     @Override
-    public List<User> getUserList() {
-        return null;
-    }
-
-    @Override
-    public List<Transfer> getTransferList() {
+    public List<Transfers> getTransferList() {
         return null;
     }
 
@@ -62,23 +85,25 @@ public class JdbcTransferDAO implements TransferDAO {
         return null;
     }
 
+/*    @Override
+    public String getTransferStatus(String statusString) {
+        return null;
+    }*/
+
     @Override
     public String getTransferDetails() {
         return null;
     }
 
     @Override
-    public List<Transfer> listAllTransfersSent() {
+    public List<Transfers> listAllMyTransfers() {
+        /*List<Transfers> transferList = new ArrayList<>();
+        String query = "SELECT */
         return null;
     }
 
     @Override
-    public List<Transfer> searchAllTransfersById() {
-        return null;
-    }
-
-    @Override
-    public List<Transfer> listAllTransfersReceived() {
+    public List<Transfers> searchAllTransfersById() {
         return null;
     }
 
@@ -95,15 +120,15 @@ public class JdbcTransferDAO implements TransferDAO {
         return amount;
     }*/
 
-    private Transfer mapRowToTransfer(SqlRowSet rowSet) {
-        Transfer transfer = new Transfer();
-        transfer.setTransferId(rowSet.getLong("transfer_id"));
-        transfer.setTransferTypeId(rowSet.getLong("transfer_type_id"));
-        transfer.setTransferStatusId(rowSet.getLong("transfer_status_id"));
-        transfer.setAccountFrom(rowSet.getLong("account_from"));
-        transfer.setAccountTo(rowSet.getLong("account_to"));
-        transfer.setAmount(rowSet.getBigDecimal("amount"));
+    private Transfers mapRowToTransfer(SqlRowSet rowSet) {
+        Transfers transfers = new Transfers();
+        transfers.setTransferId(rowSet.getLong("transfer_id"));
+        transfers.setTransferTypeId(rowSet.getLong("transfer_type_id"));
+        transfers.setTransferStatusId(rowSet.getLong("transfer_status_id"));
+        transfers.setAccountFrom(rowSet.getLong("account_from"));
+        transfers.setAccountTo(rowSet.getLong("account_to"));
+        transfers.setAmount(rowSet.getBigDecimal("amount"));
 
-        return transfer;
+        return transfers;
     }
 }
