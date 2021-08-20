@@ -79,6 +79,6 @@ public class TenmoController {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "account/{accountFrom}/transfers/{accountTo}", method = RequestMethod.POST)
     public void sendTransfer(@Valid @PathVariable int accountFrom, @PathVariable int accountTo, @RequestBody Transfers transfers) {
-        transferDAO.sendTransfer(accountFrom, accountTo, new BigDecimal("50.00"), transfers);
+        transferDAO.sendTransfer(accountFrom, accountTo, transfers.getAmount(), transfers, transfers.getTransferStatusId(), transfers.getTransferTypeId());
     }
 }

@@ -30,7 +30,7 @@ public class TransferService {
             return null;
         }
         // need try/catch?
-        return restTemplate.postForObject(BASE_URL + "transfer/", makeTransferEntity(transfer), Transfer.class);
+        return restTemplate.postForObject(BASE_URL + "transfer/", makeTransferEntity(transfer),  Transfer.class);
     }
 
     private HttpEntity<Transfer> makeTransferEntity(Transfer transfer) {

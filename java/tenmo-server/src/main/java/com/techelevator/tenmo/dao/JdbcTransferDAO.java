@@ -47,7 +47,8 @@ public class JdbcTransferDAO implements TransferDAO {
     }
 
     @Override
-    public String sendTransfer(int accountFrom, int accountTo, BigDecimal amount, Transfers transfers) {
+    public String sendTransfer(int accountFrom, int accountTo, BigDecimal amount,
+                               Transfers transfers, long transferStatusId, long transferTypeId) {
         BigDecimal fromAmount = accountDAO.getBalance(accountFrom);
         BigDecimal toAmount = accountDAO.getBalance(accountTo);
         if (accountFrom == accountTo) return "You cannot send a transfer to yourself!";
@@ -56,12 +57,11 @@ public class JdbcTransferDAO implements TransferDAO {
         }
         else {
             String query = "BEGIN TRANSACTION; " +
-                                "INSERT INTO transfers (transfer_id, transfer_type_id, transfer_status_id, account_from, account_to) " +
-                                "VALUES (DEFAULT, ?, ?, ?, ?); " +
-                                "UPDATE accounts SET balance = balance - ? WHERE user_id = ? " +
-                                "UPDATE accounts SET balance = balance + ? WHERE user_id = ?; " +
+                                "INSERT INTO transfers (transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
+                                "VALUES (DEFAULT, ?, ?, ?, ?, ?);" +
                             "COMMIT";
-            jdbcTemplate.update(query, accountFrom, accountTo, amount);
+            jdbcTemplate.update(query, transferTypeId, transferStatusId,
+                    accountFrom, accountTo, amount);
             accountDAO.addToBalance(accountDAO.getAccount(accountTo), amount);
             accountDAO.subtractFromBalance(accountDAO.getAccount(accountFrom), amount);
             return "Transfer successful!"; // show current user's new balance
@@ -74,7 +74,12 @@ public class JdbcTransferDAO implements TransferDAO {
                 "VALUES (?, ?)";
         jdbcTemplate.update(query, id, status);
     }
-
+    @Override
+    public void createTransferType(long id, String type) {
+        String query = "INSERT INTO transfer_statuses(transfer_statuses_id, transfer_statuses_desc)" +
+                "VALUES (?, ?)";
+        jdbcTemplate.update(query, id, type);
+    }
     @Override
     public List<Transfers> getTransferList() {
         return null;

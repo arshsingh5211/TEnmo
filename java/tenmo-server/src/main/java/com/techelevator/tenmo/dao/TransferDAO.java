@@ -9,9 +9,11 @@ import java.util.List;
 public interface TransferDAO {
     Transfers getTransferById(long transferId);
     Transfers createTransfer(Transfers transfers, int typeId);
-    String sendTransfer(int accountFrom, int accountTo, BigDecimal amount, Transfers transfers);
+    String sendTransfer(int accountFrom, int accountTo, BigDecimal amount,
+                        Transfers transfers, long transferStatusId, long transferTypeId);
     List<Transfers> getTransferList();
     String getTransferStatus();
+    public void createTransferType(long id, String type);
     String getTransferDetails();
     List<Transfers> searchAllTransfersById(); // current user plus whatever id we pass in (interactions)
     List<Transfers> listAllMyTransfers();

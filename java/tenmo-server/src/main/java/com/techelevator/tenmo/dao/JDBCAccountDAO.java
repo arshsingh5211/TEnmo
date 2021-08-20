@@ -41,14 +41,14 @@ public class JDBCAccountDAO implements AccountDAO {
 
     @Override
     public void addToBalance(Account account, BigDecimal amountToAdd) {
-        String query = "UPDATE accounts SET account_id = ?, balance = ? WHERE account_id = ?";
-        jdbcTemplate.update(query, account.getAccountId(), account.getBalance().add(amountToAdd), account.getUserId());
+        String query = "UPDATE accounts SET balance = ? WHERE account_id = ?";
+        jdbcTemplate.update(query, account.getBalance().add(amountToAdd), account.getUserId());
     }
 
     @Override
     public void subtractFromBalance(Account account, BigDecimal amountToSubtract) {
-        String query = "UPDATE accounts SET account_id = ?, balance = ? WHERE account_id = ?";
-        jdbcTemplate.update(query, account.getAccountId(), account.getBalance().subtract(amountToSubtract), account.getUserId());
+        String query = "UPDATE accounts SET balance = ? WHERE account_id = ?";
+        jdbcTemplate.update(query, account.getBalance().subtract(amountToSubtract), account.getUserId());
     }
     // ********should we combine these into one updateBalance()?*************
 
