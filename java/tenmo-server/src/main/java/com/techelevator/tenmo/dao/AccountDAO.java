@@ -6,11 +6,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface AccountDAO {
-    Account getAccount(int id);
+    Account getAccount(long id);
     Account getAccount(String username); //left both getAccounts as not sure which we want to use yet
     List<Account> getAllAccounts();
-    BigDecimal getBalance(int id);
-    void addToBalance(Account account, BigDecimal amountToAdd);
-    void subtractFromBalance(Account account, BigDecimal amountToSubtract);
-    void deleteAccount(int id); // eventually change all IDs to long
+    BigDecimal getBalance(long id);
+    BigDecimal addToBalance(long accountId, BigDecimal amountToAdd);
+    BigDecimal subtractFromBalance(long accountId, BigDecimal amountToSubtract);
+    void deleteAccount(long id);
 }

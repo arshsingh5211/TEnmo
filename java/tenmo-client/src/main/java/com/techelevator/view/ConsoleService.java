@@ -8,6 +8,7 @@ import org.springframework.http.HttpEntity;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class ConsoleService {
@@ -95,7 +96,7 @@ public class ConsoleService {
 		String userString;
 		System.out.println("--------------------------------------------");
 		System.out.println("Enter ID of user you are sending TE bucks to (0 to cancel):");
-		if (user != null) System.out.println(user.toString());
+		if (user != null) System.out.println(user);
 		System.out.println("--------------------------------------------");
 		System.out.println("");
 		userString = in.nextLine();
@@ -103,6 +104,22 @@ public class ConsoleService {
 
 		return userString;
 	}
+
+	public BigDecimal promptForAmount() {
+		BigDecimal amount = new BigDecimal("0.00");
+		System.out.println("--------------------------------------------");
+		System.out.println("Enter amount: ");
+		System.out.println("--------------------------------------------");
+		System.out.println("");
+
+		try {
+			amount = in.nextBigDecimal();
+		} catch (NumberFormatException e) {
+			System.out.println("Sorry, that is not a valid amount!");
+		}
+		return amount;
+	}
+
 
 	public String promptForTransfer() {
 		return promptForTransfer(null);

@@ -11,8 +11,10 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.Random;
+import java.util.Scanner;
 
 public class TransferService {
     private String BASE_URL;
@@ -26,9 +28,10 @@ public class TransferService {
         this.currentUser = currentUser;
     }
 
-    public Transfer addTransfer(String newTransfer) {
+/*    public Transfer addTransfer(String newTransfer) {
         // call helper method to make a new transfer
-        Transfer transfer = makeTransferObject(newTransfer);
+        User user = accountService.getUserByUsername(console.promptForUser());
+        Transfer transfer = makeTransferObject(newTransfer, user);
         if (transfer == null) return null;
         // call the helper method to encapsulate the body (reservation) and headers together
         HttpEntity<Transfer> entity = makeTransferEntity(transfer);
@@ -42,11 +45,11 @@ public class TransferService {
             console.printError(ex.getMessage());
         }
         return transfer;
-    }
+    }*/
 
-    public Transfer sendTransfer(String newTransfer) {
-
-        Transfer transfer = makeTransferObject(newTransfer); //makeTransfer(csv) method needed?
+/*    public Transfer sendTransfer(String newTransfer) {
+        User user = accountService.getUserByUsername(console.promptForUser());
+        Transfer transfer = makeTransferObject(newTransfer, user); //makeTransfer(csv) method needed?
         if (transfer == null) {
             return null;
         }
@@ -55,15 +58,45 @@ public class TransferService {
         restTemplate.postForObject(BASE_URL + "transfer_statuses", makeTransferStatusObject(transfer), TransferStatus.class);
         return restTemplate.postForObject(BASE_URL + "account/" + transfer.getAccountFrom() + "/transfers" + transfer.getAccountTo(),
                 makeTransferEntity(transfer),  Transfer.class);
-    }
+    }*/
 
-    public void sendTransfer() {
-        User[] users = null;
+    public void sendBucks() {
+        User[] users = null;//accountService.getUsers();
         Transfer transfer = new Transfer();
-        users = restTemplate.exchange(BASE_URL + "list_users", HttpMethod.GET, makeAuthEntity(), User[].class).getBody();
-        System.out.println("--------------------------------------------------------");
-        System.out.println("Users\r\n + UD\t\tName\r\n");
-        System.out.println("--------------------------------------------------------");
+        try {
+            Scanner in = new Scanner(System.in);
+            users = restTemplate.exchange(BASE_URL + "users", HttpMethod.GET, makeAuthEntity(), User[].class).getBody();
+            console.printUsers(users);
+            //String userString = console.promptForUser();
+            /*for (User user : users) {
+                if (user.getId() != currentUser.getUser().getId()) {
+                    System.out.println(user.getId() + "\t\t\t" + user.getUsername());
+                }
+            }*/
+            System.out.println("-----------------------------------------------------\n");
+            System.out.print("Enter ID of user you are sending to (0 to cancel): ");
+            long toAccountUserId = Long.parseLong(in.nextLine());
+            transfer.setAccountTo(1002);//accountService.getAccountByUserId(toAccountUserId).getAccountId());
+            transfer.setAccountFrom(1004);//accountService.getAccountByUserId(currentUser.getUser().getId()).getAccountId());
+            if (toAccountUserId != 0) {
+                System.out.print("Enter amount: ");
+                BigDecimal amount = new BigDecimal("0.00");
+                try {
+                    double amountDbl = Double.parseDouble(in.next());
+                    amount = BigDecimal.valueOf(amountDbl);
+                    transfer.setAmount(amount);
+                } catch (NumberFormatException e) {
+                    System.out.println("Sorry, that is not a valid amount!");
+                }
+
+                //BigDecimal amountToTransfer = console.promptForAmount();
+
+                String transferString = restTemplate.exchange(BASE_URL + "transfer", HttpMethod.POST, makeTransferEntity(transfer), String.class).getBody();
+                System.out.println(transferString);
+            }
+        } catch (Exception e) { // try to change to something less generic
+           e.printStackTrace();
+        }
     }
 
     private HttpEntity<Transfer> makeTransferEntity(Transfer transfer) {
@@ -81,23 +114,7 @@ public class TransferService {
         return entity;
     }
 
-    private TransferStatus makeTransferStatusObject(Transfer transfer) {
-        TransferStatus transferStatus = new TransferStatus();
-        transferStatus.setTransferStatusId(transfer.getTransferStatusId());
-        transferStatus.setTransferStatus("Approved");
-
-        return transferStatus;
-    }
-
-    private TransferType makeTransferTypeObject(Transfer transfer) {
-        TransferType transferType = new TransferType();
-        transferType.setTransferTypeId(transfer.getTransferStatusId());
-        transferType.setTransferType("Type");
-
-        return transferType;
-    }
-
-    private Transfer makeTransferObject(String csv) {
+    private Transfer makeTransferObject(String csv, User userTo) {
         // {"recipient", 100.00}
         String[] parsed = csv.split(",".toLowerCase());
 
@@ -115,11 +132,13 @@ public class TransferService {
         }
 
         BigDecimal amount = new BigDecimal(parsed[2]);
-        long accountFrom = currentUser.getUser().getId();
-        long accountTo = accountService.getUserByUsername(parsed[1]).getId();
+        int userIdFrom = accountService.getUserByUsername(currentUser.getUser().getUsername()).getId();
+        int userIdTo = accountService.getUserByUsername(userTo.getUsername()).getId();
+        long accountFrom = accountService.getAccountByUserId(userIdFrom).getAccountId();
+        long accountTo = accountService.getAccountByUserId(userIdTo).getAccountId();
         long transferId = new Random().nextInt(1000);
-        long transferStatusId = new Random().nextInt(1000);
-        long transferTypeId = new Random().nextInt(1000);
+        long transferStatusId = 2; //new Random().nextInt(1000);
+        long transferTypeId = 2; //new Random().nextInt(1000);
 
         Transfer transfer = new Transfer();
         transfer.setAmount(amount);

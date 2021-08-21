@@ -102,13 +102,15 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	}
 
 	private void sendBucks() {
-    	User[] users = accountService.getUsers();
+    	/*User[] users = accountService.getUsers();
 		console.printUsers(users);
-		String userString = console.promptForUser();
-		User user = accountService.getUserByUsername(userString);
+		//String userString = console.promptForUser();
+		User user = getUserFromList(users);
 		String newTransferString = console.promptForTransfer();
 		Transfer transfer = transferService.addTransfer(newTransferString);
-		if (transfer == null) System.out.println("Invalid transfer. Please try again.");
+		if (transfer == null) System.out.println("Invalid transfer. Please try again.");*/
+		transferService = new TransferService(API_BASE_URL, currentUser);
+		transferService.sendBucks();
 	}
 
 	private void requestBucks() {
@@ -116,9 +118,10 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		
 	}
 
-	public User getUserFromList() {
-		User[] userArr =  restTemplate.exchange(API_BASE_URL + "users/", HttpMethod.GET, makeUserEntity(),
-				User[].class).getBody();
+	public User getUserFromList(User[] userArr) {
+		//User[] userArr = accountService.getUsers();
+				//restTemplate.exchange(API_BASE_URL + "users", HttpMethod.GET, makeUserEntity(),
+				//User[].class).getBody();
 		String[] userNameArr = new String [userArr.length];
 		Integer id = null;
 
@@ -131,7 +134,6 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		User selection = restTemplate.exchange(API_BASE_URL + "user_names/?name=" + chosenUserName,
 				HttpMethod.GET, makeUserEntity(), User.class).getBody();
 		return selection;
-
 	}
 	
 	private void exitProgram() {

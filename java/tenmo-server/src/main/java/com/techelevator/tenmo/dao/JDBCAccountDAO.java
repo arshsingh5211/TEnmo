@@ -20,7 +20,7 @@ public class JDBCAccountDAO implements AccountDAO {
     }
 
     @Override
-    public BigDecimal getBalance (int id) {
+    public BigDecimal getBalance (long id) {
         BigDecimal balance = null;
         String query = "SELECT balance FROM accounts WHERE user_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(query, id);
@@ -31,7 +31,7 @@ public class JDBCAccountDAO implements AccountDAO {
     }
 
     @Override
-    public Account getAccount (int id) {
+    public Account getAccount (long id) {
         Account account = null;
         String query = "SELECT * FROM accounts WHERE user_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(query, id);
@@ -42,21 +42,27 @@ public class JDBCAccountDAO implements AccountDAO {
     }
 
     @Override
-    public void addToBalance(Account account, BigDecimal amountToAdd) {
+    public BigDecimal addToBalance(long accountId, BigDecimal amountToAdd) {
+        Account account = getAccount(accountId);
+        BigDecimal newBalance = account.getBalance().add(amountToAdd);
         String query = "UPDATE accounts SET balance = ? WHERE account_id = ?";
-        jdbcTemplate.update(query, account.getBalance().add(amountToAdd), account.getUserId());
+        jdbcTemplate.update(query, newBalance, accountId);
+        return account.getBalance();
     }
 
     @Override
-    public void subtractFromBalance(Account account, BigDecimal amountToSubtract) {
+    public BigDecimal subtractFromBalance(long accountId, BigDecimal amountToSubtract) {
+        Account account = getAccount(accountId);
+        BigDecimal newBalance = account.getBalance().subtract(amountToSubtract);
         String query = "UPDATE accounts SET balance = ? WHERE account_id = ?";
-        jdbcTemplate.update(query, account.getBalance().subtract(amountToSubtract), account.getUserId());
+        jdbcTemplate.update(query, newBalance, accountId);
+        return account.getBalance();
     }
     // ********should we combine these into one updateBalance()?*************
 
 
     @Override
-    public void deleteAccount(int id) {
+    public void deleteAccount(long id) {
         String query = "DELETE FROM accounts WHERE account_id = ?";
         jdbcTemplate.update(query, id);
     }

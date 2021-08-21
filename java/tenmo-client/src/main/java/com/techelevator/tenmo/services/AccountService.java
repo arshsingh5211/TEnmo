@@ -1,7 +1,7 @@
 package com.techelevator.tenmo.services;
 
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.Balance;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.view.ConsoleService;
 import org.springframework.http.HttpEntity;
@@ -46,6 +46,8 @@ public class AccountService {
     public User[] getUsers() {
         User[] userList = null;
         try {
+            /*userList = restTemplate.exchange(BASE_URL + "users", HttpMethod.GET, makeAuthEntity(),
+                    User[].class).getBody();*/
             userList = restTemplate.getForObject(BASE_URL + "users", User[].class);
         } catch (RestClientResponseException ex) {
             // handles exceptions thrown by rest template and contains status codes
@@ -69,6 +71,20 @@ public class AccountService {
             console.printError(ex.getMessage());
         }
         return user;
+    }
+
+    public Account getAccountByUserId(long id) {
+        Account account = null;
+        try {
+            account = restTemplate.getForObject(BASE_URL + "account/" + id, Account.class);
+        } catch (RestClientResponseException ex) {
+            // handles exceptions thrown by rest template and contains status codes
+            console.printError(ex.getRawStatusCode() + " : " + ex.getStatusText());
+        } catch (ResourceAccessException ex) {
+            // i/o error, ex: the server isn't running
+            console.printError(ex.getMessage());
+        }
+        return account;
     }
 
     private HttpEntity makeAuthEntity() {

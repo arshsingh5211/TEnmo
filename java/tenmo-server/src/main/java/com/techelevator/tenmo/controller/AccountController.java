@@ -28,15 +28,21 @@ public class AccountController {
         this.userDao = userDao;
     }
 
-    @PreAuthorize("permitAlgl()")
+    @PreAuthorize("permitAll()")
     @RequestMapping(path = "all_accounts", method = RequestMethod.GET)
     public List<Account> getAllAccounts() {
         return accountDAO.getAllAccounts();
     }
 
     @PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
+    @RequestMapping(path = "account/{id}", method = RequestMethod.GET)
+    public Account getAccount (@PathVariable int id) {
+        return accountDAO.getAccount(id);
+    }
+
+    @PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
     @RequestMapping(path = "balance/{id}", method = RequestMethod.GET)
-    public BigDecimal getBalance (@PathVariable int id) {
+    public BigDecimal getBbalaalance (@PathVariable int id) {
         //System.out.println(principal.getName());
         return accountDAO.getBalance(id);
     }

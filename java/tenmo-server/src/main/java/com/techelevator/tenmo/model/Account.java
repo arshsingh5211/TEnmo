@@ -7,14 +7,6 @@ public class Account {
     private long userId;
     private BigDecimal balance;
 
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
-    }
-
     public long getAccountId() {
         return accountId;
     }
@@ -29,5 +21,13 @@ public class Account {
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 }
