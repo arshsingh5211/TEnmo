@@ -9,7 +9,12 @@ import com.techelevator.tenmo.services.AuthenticationServiceException;
 import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.TransferService;
 import com.techelevator.view.ConsoleService;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
 
 public class App {
 
@@ -42,6 +47,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	public App(ConsoleService console, AuthenticationService authenticationService) {
 		this.console = console;
 		this.authenticationService = authenticationService;
+		accountService = new AccountService(API_BASE_URL, currentUser);
 	}
 
 	public void run() {
@@ -96,29 +102,36 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	}
 
 	private void sendBucks() {
-		transferService = new TransferService(API_BASE_URL, currentUser);
-		accountService = new AccountService(API_BASE_URL, currentUser);
-
-		int counter = 1;
-		for (User user : accountService.getUsers()) {
-			System.out.println(counter + ") " + user.getUsername());
-			counter++;
-		}
-
-		String transferData = console.promptForTransfer();
-		Transfer transfer = transferService.sendTransfer(transferData);
-		try {
-			//transferService.sendTransfer();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+    	User[] users = accountService.getUsers();
+		console.printUsers(users);
+		String userString = console.promptForUser();
+		User user = accountService.getUserByUsername(userString);
+		String newTransferString = console.promptForTransfer();
+		Transfer transfer = transferService.addTransfer(newTransferString);
+		if (transfer == null) System.out.println("Invalid transfer. Please try again.");
 	}
 
 	private void requestBucks() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public User getUserFromList() {
+		User[] userArr =  restTemplate.exchange(API_BASE_URL + "users/", HttpMethod.GET, makeUserEntity(),
+				User[].class).getBody();
+		String[] userNameArr = new String [userArr.length];
+		Integer id = null;
+
+		for (int i = 0; i < userArr.length; i++) {
+			String name = userArr[i].getUsername();
+			userNameArr[i] = name;
+		}
+		String chosenUserName = (String) console.getChoiceFromOptions(userNameArr);
+		if (chosenUserName.equals("0")) mainMenu();
+		User selection = restTemplate.exchange(API_BASE_URL + "user_names/?name=" + chosenUserName,
+				HttpMethod.GET, makeUserEntity(), User.class).getBody();
+		return selection;
+
 	}
 	
 	private void exitProgram() {
@@ -179,5 +192,12 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		String username = console.getUserInput("Username");
 		String password = console.getUserInput("Password");
 		return new UserCredentials(username, password);
+	}
+
+	private HttpEntity makeUserEntity() {
+		HttpHeaders headers = new HttpHeaders();
+		headers.setBearerAuth(currentUser.getToken());
+		HttpEntity entity = new HttpEntity<>(headers);
+		return entity;
 	}
 }

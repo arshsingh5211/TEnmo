@@ -3,10 +3,12 @@ package com.techelevator.tenmo.dao;
 import com.techelevator.tenmo.model.Account;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface AccountDAO {
     Account getAccount(int id);
     Account getAccount(String username); //left both getAccounts as not sure which we want to use yet
+    List<Account> getAllAccounts();
     BigDecimal getBalance(int id);
     void addToBalance(Account account, BigDecimal amountToAdd);
     void subtractFromBalance(Account account, BigDecimal amountToSubtract);

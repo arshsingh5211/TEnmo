@@ -31,13 +31,6 @@ public class TenmoController {
         this.transferDAO = transferDAO;
     }
 
-    @PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
-    @RequestMapping(path = "balance/{id}", method = RequestMethod.GET)
-    public BigDecimal getBalance (@PathVariable int id) {
-        //System.out.println(principal.getName());
-        return accountDAO.getBalance(id);
-    }
-
     @PreAuthorize("permitAll()")
     @RequestMapping(path = "account/transfer/{id}", method = RequestMethod.GET)
     public Transfers getSpecificTransfer (@PathVariable long id) {
@@ -54,19 +47,7 @@ public class TenmoController {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "transfers", method = RequestMethod.POST)
     public Transfers sendTransfer(@Valid @RequestBody Transfers transfers, @PathVariable long typeId) {
-        return transferDAO.createTransfer(transfers, 2); // sent request pending
-    }
-
-    @PreAuthorize("permitAll()")
-    @RequestMapping(path = "users", method = RequestMethod.GET)
-    public List<User> getUsers() {
-        return userDao.findAll();
-    }
-
-    @PreAuthorize("permitAll()")
-    @RequestMapping(path = "users/{username}", method = RequestMethod.GET)
-    public User getUserByUsername(@PathVariable String username){
-        return userDao.findByUsername(username);
+        return transferDAO.createTransfer(transfers); // sent request pending
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -79,10 +60,10 @@ public class TenmoController {
     public void createTransferType(@RequestBody Transfers transfer) {
         transferDAO.createTransferType(transfer);
     }
-    @PreAuthorize("permitAll()")
+    /*@PreAuthorize("permitAll()")
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "account/{accountFrom}/transfers/{accountTo}", method = RequestMethod.POST)
     public void sendTransfer(@Valid @PathVariable int accountFrom, @PathVariable int accountTo, @RequestBody Transfers transfers) {
         transferDAO.sendTransfer(accountFrom, accountTo, transfers.getAmount(), transfers, transfers.getTransferStatusId(), transfers.getTransferTypeId());
-    }
+    }*/
 }

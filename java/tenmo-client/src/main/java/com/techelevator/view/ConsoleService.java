@@ -2,6 +2,8 @@ package com.techelevator.view;
 
 
 import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.User;
+import org.springframework.http.HttpEntity;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -76,6 +78,32 @@ public class ConsoleService {
 		return result;
 	}
 
+	public void printUsers(User[] users) {
+		System.out.println("--------------------------------------------");
+		System.out.println("ID\t\t\tUser Name");
+		System.out.println("--------------------------------------------");
+		for (User user : users) {
+			System.out.println(user.getId() + "\t\t\t" + user.getUsername());
+		}
+	}
+
+	public String promptForUser() {
+		return promptForUser(null);
+	}
+
+	public String promptForUser(User user) {
+		String userString;
+		System.out.println("--------------------------------------------");
+		System.out.println("Enter ID of user you are sending TE bucks to (0 to cancel):");
+		if (user != null) System.out.println(user.toString());
+		System.out.println("--------------------------------------------");
+		System.out.println("");
+		userString = in.nextLine();
+		if (user != null) userString = user.getId() + ", " + userString;
+
+		return userString;
+	}
+
 	public String promptForTransfer() {
 		return promptForTransfer(null);
 	}
@@ -83,8 +111,7 @@ public class ConsoleService {
 	public String promptForTransfer(Transfer transfer) {
 		String transferString;
 		System.out.println("--------------------------------------------");
-		System.out.println("Enter the Tenmo username and amount you wish " +
-				"to transfer separated by a comma:");
+		System.out.println("Enter amount: ");
 		if (transfer != null) {
 			System.out.println(transfer.toString());
 		} else {
@@ -99,4 +126,10 @@ public class ConsoleService {
 		}
 		return transferString;
 	}
+
+	public void printError(String errorMessage) {
+		System.err.println(errorMessage);
+	}
+
+
 }

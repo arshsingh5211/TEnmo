@@ -1,9 +1,13 @@
 package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.*;
+import com.techelevator.view.ConsoleService;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -15,10 +19,29 @@ public class TransferService {
     private AuthenticatedUser currentUser;
     private RestTemplate restTemplate = new RestTemplate();
     private AccountService accountService;
+    private final ConsoleService console = new ConsoleService(System.in, System.out);
 
     public TransferService(String BASE_URL, AuthenticatedUser currentUser) {
         this.BASE_URL = BASE_URL;
         this.currentUser = currentUser;
+    }
+
+    public Transfer addTransfer(String newTransfer) {
+        // call helper method to make a new transfer
+        Transfer transfer = makeTransferObject(newTransfer);
+        if (transfer == null) return null;
+        // call the helper method to encapsulate the body (reservation) and headers together
+        HttpEntity<Transfer> entity = makeTransferEntity(transfer);
+        // postForObject (url, entity (headers and body encapsulated), class literal for what object is sent back
+        try {
+            transfer = restTemplate.postForObject(BASE_URL + "accounts/" + transfer.getTransferId() +
+                    "/transfers", entity, Transfer.class);
+        } catch (RestClientResponseException e){
+            console.printError(e.getRawStatusCode() + " : " + e.getMessage());
+        } catch (ResourceAccessException ex){
+            console.printError(ex.getMessage());
+        }
+        return transfer;
     }
 
     public Transfer sendTransfer(String newTransfer) {
@@ -32,6 +55,15 @@ public class TransferService {
         restTemplate.postForObject(BASE_URL + "transfer_statuses", makeTransferStatusObject(transfer), TransferStatus.class);
         return restTemplate.postForObject(BASE_URL + "account/" + transfer.getAccountFrom() + "/transfers" + transfer.getAccountTo(),
                 makeTransferEntity(transfer),  Transfer.class);
+    }
+
+    public void sendTransfer() {
+        User[] users = null;
+        Transfer transfer = new Transfer();
+        users = restTemplate.exchange(BASE_URL + "list_users", HttpMethod.GET, makeAuthEntity(), User[].class).getBody();
+        System.out.println("--------------------------------------------------------");
+        System.out.println("Users\r\n + UD\t\tName\r\n");
+        System.out.println("--------------------------------------------------------");
     }
 
     private HttpEntity<Transfer> makeTransferEntity(Transfer transfer) {

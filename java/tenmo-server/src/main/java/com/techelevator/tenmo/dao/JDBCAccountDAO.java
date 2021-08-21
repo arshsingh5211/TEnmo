@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class JDBCAccountDAO implements AccountDAO {
@@ -69,6 +71,17 @@ public class JDBCAccountDAO implements AccountDAO {
             account = mapRowToAccount(results);
         }
         return account;
+    }
+
+    @Override
+    public List<Account> getAllAccounts() {
+        List<Account> accountList = new ArrayList<>();
+        String query = "SELECT * FROM accounts";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(query);
+        while (results.next()) {
+            accountList.add(mapRowToAccount(results));
+        }
+        return accountList;
     }
 
     private Account mapRowToAccount(SqlRowSet rowSet) {
