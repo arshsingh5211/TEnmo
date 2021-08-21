@@ -28,7 +28,7 @@ public class AccountController {
         this.userDao = userDao;
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("permitAlgl()")
     @RequestMapping(path = "all_accounts", method = RequestMethod.GET)
     public List<Account> getAllAccounts() {
         return accountDAO.getAllAccounts();
