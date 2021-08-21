@@ -36,7 +36,7 @@ public class JdbcTransferDAO implements TransferDAO {
     public String sendTransfer(long accountFrom, long accountTo, BigDecimal amount) { // <--- null pointer exception here
         BigDecimal fromAmount = accountDAO.getBalance(accountFrom);
         if (accountFrom == accountTo) return "You cannot send a transfer to yourself!";
-        if (fromAmount.compareTo(amount) == 1 && amount.compareTo(new BigDecimal("0.00")) == 1) {
+        //if (fromAmount.compareTo(amount) == 1 && amount.compareTo(new BigDecimal("0.00")) == 1) {
             String query = "BEGIN TRANSACTION; " +
                                 "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
                                 "VALUES (2, 2, ?, ?, ?); " +
@@ -45,8 +45,8 @@ public class JdbcTransferDAO implements TransferDAO {
             accountDAO.addToBalance(accountTo, amount);
             accountDAO.subtractFromBalance(accountFrom, amount);
            return "Transfer successful!"; // show current user's new balance
-       }
-        else return "Invalid transfer! Please add more TEbucks to your account or change transfer amount.";
+       //}
+        //else return "Invalid transfer! Please add more TEbucks to your account or change transfer amount.";
     }
 
     @Override
