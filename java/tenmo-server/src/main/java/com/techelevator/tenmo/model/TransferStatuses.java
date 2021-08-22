@@ -1,8 +1,8 @@
 package com.techelevator.tenmo.model;
 
-public class TransferStatus {
+public class TransferStatuses {
     private long transferStatusId;
-    private String transferStatus;
+    private String transferStatusDesc;
 
     public long getTransferStatusId() {
         return transferStatusId;
@@ -12,11 +12,11 @@ public class TransferStatus {
         this.transferStatusId = transferStatusId;
     }
 
-    public String getTransferStatus() {
-        return transferStatus;
+    public String getTransferStatusDesc() {
+        return transferStatusDesc;
     }
 
-    public void setTransferStatus(String transferStatus) {
-        this.transferStatus = transferStatus;
+    public void setTransferStatusDesc(String transferStatusDesc) {
+        this.transferStatusDesc = transferStatusDesc;
     }
 }

@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.model.TransferNotFoundException;
 import com.techelevator.tenmo.model.Transfers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,36 +25,44 @@ public class JdbcTransferDAO implements TransferDAO {
     @Override
     public Transfers getTransferById(long transferId) {
         Transfers transfers = new Transfers();
-        String query = "SELECT * FROM transfers WHERE transfer_id = ?";
+        String query = "SELECT t.*, u.username AS userFrom, v.username AS userTo, ts.transfer_status_desc, tt.transfer_type_desc FROM transfers t " +
+                "JOIN accounts a ON t.account_from = a.account_id " +
+                "JOIN accounts b ON t.account_to = b.account_id " +
+                "JOIN users u ON a.user_id = u.user_id " +
+                "JOIN users v ON b.user_id = v.user_id " +
+                "JOIN transfer_statuses ts ON t.transfer_status_id = ts.transfer_status_id " +
+                "JOIN transfer_types tt ON t.transfer_type_id = tt.transfer_type_id " +
+                "WHERE t.transfer_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(query, transferId);
-        while (results.next()) {
-            transfers = mapRowToTransfer(results);
-        }
+        if (results.next()) transfers = mapRowToTransfer(results);
+        else throw new TransferNotFoundException();
         return transfers;
     }
 
     @Override
-    public String sendTransfer(long accountFrom, long accountTo, BigDecimal amount) { // <--- null pointer exception here
-        BigDecimal fromAmount = accountDAO.getBalance(accountFrom);
-        if (accountFrom == accountTo) return "You cannot send a transfer to yourself!";
-        //if (fromAmount.compareTo(amount) == 1 && amount.compareTo(new BigDecimal("0.00")) == 1) {
-            String query = "BEGIN TRANSACTION; " +
-                                "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                                "VALUES (2, 2, ?, ?, ?); " +
-                            "COMMIT";
-            jdbcTemplate.update(query, accountFrom, accountTo, amount);
-            accountDAO.addToBalance(accountTo, amount);
-            accountDAO.subtractFromBalance(accountFrom, amount);
+    public String sendTransfer(long userFrom, long userTo, BigDecimal amount) {
+        if (userFrom == userTo) return "You cannot send a transfer to yourself!";
+        if (/*accountDAO.getBalance(userFrom).compareTo(amount) == 1 && */amount.compareTo(new BigDecimal("0.00")) == 1) {
+            String query = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
+                                "VALUES (2, 2, ?, ?, ?) ";
+            jdbcTemplate.update(query, userFrom, userTo, amount);
+            accountDAO.addToBalance(userTo, amount);
+            accountDAO.subtractFromBalance(userFrom, amount);
            return "Transfer successful!"; // show current user's new balance
-       //}
-        //else return "Invalid transfer! Please add more TEbucks to your account or change transfer amount.";
+       }
+        else return "Invalid transfer! Please add more TEbucks to your account or change transfer amount.";
     }
 
     @Override
-    public List<Transfers> getTransferList() {
+    public List<Transfers> getTransferList(long userId) {
         List<Transfers> transfersList = new ArrayList<>();
-        String query = "SELECT * FROM transfers";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(query);
+        String query = "SELECT t.*, u.username AS sender, v.username AS recipient FROM transfers t " +
+                "JOIN accounts a ON t.account_from = a.account_id " +
+                "JOIN accounts b ON t.account_to = b.account_id " +
+                "JOIN users u ON a.user_id = u.user_id " +
+                "JOIN users v ON b.user_id = v.user_id " +
+                "WHERE a.user_id = ? OR b.user_id = ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(query, userId, userId);
         while (results.next()) {
             transfersList.add(mapRowToTransfer(results));
         }
@@ -61,18 +70,39 @@ public class JdbcTransferDAO implements TransferDAO {
     }
 
     @Override
-    public String getTransferStatus() {
-        return null;
-    }
+    public String getTransferDetails(long transferId) {
+        String query = "SELECT transfer_id, u.username AS from_user, v.username AS to_user, transfer_type_desc, transfer_status_desc, amount " +
+        "FROM transfer_types JOIN transfers USING (transfer_type_id) JOIN transfer_statuses USING (transfer_status_id) " +
+        "JOIN accounts a ON transfers.account_from = a.account_id " +
+        "JOIN accounts b ON transfers.account_to = b.account_id " +
+        "JOIN users u ON a.user_id = u.user_id " +
+        "JOIN users v ON b.user_id = v.user_id " +
+        "WHERE transfer_id = ?";
 
-    @Override
-    public String getTransferDetails() {
-        return null;
+        SqlRowSet results = jdbcTemplate.queryForRowSet(query, transferId);
+        return results.toString(); // how do we get these results to client, this returns hash
     }
 
     @Override
     public List<Transfers> searchAllTransfersById() {
         return null;
+    }
+
+    @Override
+    public String updateTransferRequest(Transfers transfer, long statusId) {
+        if (statusId == 3) {
+            String sql = "UPDATE transfers SET transfer_status_id = ? WHERE transfer_id = ?;";
+            jdbcTemplate.update(sql, statusId, transfer.getTransferId());
+            return "Request updated!";
+        }
+        if (accountDAO.getBalance(transfer.getAccountFrom()).compareTo(transfer.getAmount()) != -1) {
+            String sql = "UPDATE transfers SET transfer_status_id = ? WHERE transfer_id = ?;";
+            jdbcTemplate.update(sql, statusId, transfer.getTransferId());
+            accountDAO.addToBalance(transfer.getAccountTo(), transfer.getAmount());
+            accountDAO.subtractFromBalance(transfer.getAccountFrom(), transfer.getAmount());
+            return "Update successful!";
+        }
+        else return "Sorry, transfer unable to be completed at this time!";
     }
 
     private Transfers mapRowToTransfer(SqlRowSet rowSet) {

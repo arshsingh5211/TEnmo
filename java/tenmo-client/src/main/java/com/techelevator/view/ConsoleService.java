@@ -1,9 +1,8 @@
 package com.techelevator.view;
 
 
-import com.techelevator.tenmo.model.Transfer;
+import com.techelevator.tenmo.model.Transfers;
 import com.techelevator.tenmo.model.User;
-import org.springframework.http.HttpEntity;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -125,12 +124,12 @@ public class ConsoleService {
 		return promptForTransfer(null);
 	}
 
-	public String promptForTransfer(Transfer transfer) {
+	public String promptForTransfer(Transfers transfers) {
 		String transferString;
 		System.out.println("--------------------------------------------");
 		System.out.println("Enter amount: ");
-		if (transfer != null) {
-			System.out.println(transfer.toString());
+		if (transfers != null) {
+			System.out.println(transfers.toString());
 		} else {
 			System.out.println("Example: JoeShmoe, 25.00");
 		}
@@ -138,8 +137,8 @@ public class ConsoleService {
 		System.out.println("");
 
 		transferString = in.nextLine();
-		if (transfer != null) {
-			transferString = transfer.getTransferId() + "," + transferString;
+		if (transfers != null) {
+			transferString = transfers.getTransferId() + "," + transferString;
 		}
 		return transferString;
 	}

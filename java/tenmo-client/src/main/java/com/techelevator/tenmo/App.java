@@ -1,7 +1,6 @@
 package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
@@ -13,8 +12,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
-
-import java.util.Arrays;
 
 public class App {
 
@@ -107,7 +104,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		//String userString = console.promptForUser();
 		User user = getUserFromList(users);
 		String newTransferString = console.promptForTransfer();
-		Transfer transfer = transferService.addTransfer(newTransferString);
+		Transfers transfer = transferService.addTransfer(newTransferString);
 		if (transfer == null) System.out.println("Invalid transfer. Please try again.");*/
 		transferService = new TransferService(API_BASE_URL, currentUser);
 		transferService.sendBucks();

@@ -6,13 +6,10 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Locale;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -28,17 +25,17 @@ public class TransferService {
         this.currentUser = currentUser;
     }
 
-/*    public Transfer addTransfer(String newTransfer) {
+/*    public Transfers addTransfer(String newTransfer) {
         // call helper method to make a new transfer
         User user = accountService.getUserByUsername(console.promptForUser());
-        Transfer transfer = makeTransferObject(newTransfer, user);
+        Transfers transfer = makeTransferObject(newTransfer, user);
         if (transfer == null) return null;
         // call the helper method to encapsulate the body (reservation) and headers together
-        HttpEntity<Transfer> entity = makeTransferEntity(transfer);
+        HttpEntity<Transfers> entity = makeTransferEntity(transfer);
         // postForObject (url, entity (headers and body encapsulated), class literal for what object is sent back
         try {
             transfer = restTemplate.postForObject(BASE_URL + "accounts/" + transfer.getTransferId() +
-                    "/transfers", entity, Transfer.class);
+                    "/transfers", entity, Transfers.class);
         } catch (RestClientResponseException e){
             console.printError(e.getRawStatusCode() + " : " + e.getMessage());
         } catch (ResourceAccessException ex){
@@ -47,22 +44,22 @@ public class TransferService {
         return transfer;
     }*/
 
-/*    public Transfer sendTransfer(String newTransfer) {
+/*    public Transfers sendTransfer(String newTransfer) {
         User user = accountService.getUserByUsername(console.promptForUser());
-        Transfer transfer = makeTransferObject(newTransfer, user); //makeTransfer(csv) method needed?
+        Transfers transfer = makeTransferObject(newTransfer, user); //makeTransfer(csv) method needed?
         if (transfer == null) {
             return null;
         }
         // need try/catch?
-        restTemplate.postForObject(BASE_URL + "transfer_types", makeTransferTypeObject(transfer), TransferType.class);
-        restTemplate.postForObject(BASE_URL + "transfer_statuses", makeTransferStatusObject(transfer), TransferStatus.class);
+        restTemplate.postForObject(BASE_URL + "transfer_types", makeTransferTypeObject(transfer), TransferTypes.class);
+        restTemplate.postForObject(BASE_URL + "transfer_statuses", makeTransferStatusObject(transfer), TransferStatuses.class);
         return restTemplate.postForObject(BASE_URL + "account/" + transfer.getAccountFrom() + "/transfers" + transfer.getAccountTo(),
-                makeTransferEntity(transfer),  Transfer.class);
+                makeTransferEntity(transfer),  Transfers.class);
     }*/
 
     public void sendBucks() {
         User[] users = null;//accountService.getUsers();
-        Transfer transfer = new Transfer();
+        Transfers transfers = new Transfers();
         try {
             Scanner in = new Scanner(System.in);
             users = restTemplate.exchange(BASE_URL + "users", HttpMethod.GET, makeAuthEntity(), User[].class).getBody();
@@ -76,34 +73,38 @@ public class TransferService {
             System.out.println("-----------------------------------------------------\n");
             System.out.print("Enter ID of user you are sending to (0 to cancel): ");
             long toAccountUserId = Long.parseLong(in.nextLine());
-            transfer.setAccountTo(1002);//accountService.getAccountByUserId(toAccountUserId).getAccountId());
-            transfer.setAccountFrom(1004);//accountService.getAccountByUserId(currentUser.getUser().getId()).getAccountId());
+            transfers.setAccountTo(1002);//accountService.getAccountByUserId(toAccountUserId).getAccountId());
+            transfers.setAccountFrom(1004);//accountService.getAccountByUserId(currentUser.getUser().getId()).getAccountId());
             if (toAccountUserId != 0) {
                 System.out.print("Enter amount: ");
-                BigDecimal amount = new BigDecimal("0.00");
+                BigDecimal amount;
                 try {
                     double amountDbl = Double.parseDouble(in.next());
                     amount = BigDecimal.valueOf(amountDbl);
-                    transfer.setAmount(amount);
+                    transfers.setAmount(amount);
                 } catch (NumberFormatException e) {
                     System.out.println("Sorry, that is not a valid amount!");
                 }
 
                 //BigDecimal amountToTransfer = console.promptForAmount();
 
-                String transferString = restTemplate.exchange(BASE_URL + "transfer", HttpMethod.POST, makeTransferEntity(transfer), String.class).getBody();
-                System.out.println(transferString);
+                try {
+                    String transferString = restTemplate.exchange(BASE_URL + "transfers", HttpMethod.POST, makeTransferEntity(transfers), String.class).getBody();
+                    System.out.println(transferString);
+                } catch (RestClientResponseException ex) {
+                    ex.printStackTrace();
+                }
             }
         } catch (Exception e) { // try to change to something less generic
            e.printStackTrace();
         }
     }
 
-    private HttpEntity<Transfer> makeTransferEntity(Transfer transfer) {
+    private HttpEntity<Transfers> makeTransferEntity(Transfers transfers) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON); // idk what this does?
         headers.setBearerAuth(currentUser.getToken());
-        HttpEntity<Transfer> entity = new HttpEntity<>(transfer, headers);
+        HttpEntity<Transfers> entity = new HttpEntity<>(transfers, headers);
         return entity;
     }
 
@@ -114,7 +115,7 @@ public class TransferService {
         return entity;
     }
 
-    private Transfer makeTransferObject(String csv, User userTo) {
+    private Transfers makeTransferObject(String csv, User userTo) {
         // {"recipient", 100.00}
         String[] parsed = csv.split(",".toLowerCase());
 
@@ -140,15 +141,15 @@ public class TransferService {
         long transferStatusId = 2; //new Random().nextInt(1000);
         long transferTypeId = 2; //new Random().nextInt(1000);
 
-        Transfer transfer = new Transfer();
-        transfer.setAmount(amount);
-        transfer.setTransferId(transferId);
-        transfer.setAccountFrom(accountFrom);
-        transfer.setAccountTo(accountTo);
-        transfer.setTransferStatusId(transferStatusId);
-        transfer.setTransferTypeId(transferTypeId);
+        Transfers transfers = new Transfers();
+        transfers.setAmount(amount);
+        transfers.setTransferId(transferId);
+        transfers.setAccountFrom(accountFrom);
+        transfers.setAccountTo(accountTo);
+        transfers.setTransferStatusId(transferStatusId);
+        transfers.setTransferTypeId(transferTypeId);
 
-        return transfer;
+        return transfers;
     }
 
     public void createTransferStatus(long id, String status) {

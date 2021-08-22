@@ -27,33 +27,37 @@ public class AccountController {
         this.accountDAO = accountDAO;
         this.userDao = userDao;
     }
-
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    //@PreAuthorize("permitAll()")
     @RequestMapping(path = "all_accounts", method = RequestMethod.GET)
     public List<Account> getAllAccounts() {
         return accountDAO.getAllAccounts();
     }
 
-    @PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
+    @PreAuthorize("hasRole('ROLE_USER')")
+    //@PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
     @RequestMapping(path = "account/{id}", method = RequestMethod.GET)
     public Account getAccount (@PathVariable int id) {
         return accountDAO.getAccount(id);
     }
 
-    @PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
+    @PreAuthorize("hasRole('ROLE_USER')")
+    //@PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
     @RequestMapping(path = "balance/{id}", method = RequestMethod.GET)
     public BigDecimal getBalance (@PathVariable int id) {
         //System.out.println(principal.getName());
         return accountDAO.getBalance(id);
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    //@PreAuthorize("permitAll()")
     @RequestMapping(path = "users", method = RequestMethod.GET)
     public List<User> getUsers() {
         return userDao.findAll();
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    //@PreAuthorize("permitAll()")
     @RequestMapping(path = "users/{username}", method = RequestMethod.GET)
     public User getUserByUsername(@PathVariable String username){
         return userDao.findByUsername(username);
