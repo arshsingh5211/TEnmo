@@ -36,7 +36,7 @@ public class AccountController {
     @PreAuthorize("hasRole('ROLE_USER')")
     //@PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
     @RequestMapping(path = "account/{id}", method = RequestMethod.GET)
-    public Account getAccount (@PathVariable int id) {
+    public Account getAccount (@PathVariable long id) {
         return accountDAO.getAccount(id);
     }
 

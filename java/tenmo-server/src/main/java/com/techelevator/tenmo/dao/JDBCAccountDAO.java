@@ -33,7 +33,7 @@ public class JDBCAccountDAO implements AccountDAO {
     @Override
     public Account getAccount (long id) {
         Account account = null;
-        String query = "SELECT * FROM accounts WHERE account_id = ?";
+        String query = "SELECT * FROM accounts WHERE user_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(query, id);
         if ((results.next())) {
             account = mapRowToAccount(results);
