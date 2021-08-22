@@ -69,6 +69,29 @@ public class JdbcTransferDAO implements TransferDAO {
         return transfersList;
     }
 
+    public String getUserFrom(long accountFrom) {
+        String userFrom = "";
+        String query = "SELECT username FROM users " +
+                "JOIN accounts ON account_id = ? " +
+                "WHERE accounts.user_id = users.user_id";
+        SqlRowSet result = jdbcTemplate.queryForRowSet(query, accountFrom);
+        if (result.next()) {
+            userFrom = result.getString("username");
+        }
+        return userFrom;
+    }
+    public String getUserTo(long accountTo) {
+        String userTo = "";
+        String query = "SELECT username FROM users " +
+                "JOIN accounts ON account_id = ? " +
+                "WHERE accounts.user_id = users.user_id";
+        SqlRowSet result = jdbcTemplate.queryForRowSet(query, accountTo);
+        if (result.next()) {
+            userTo = result.getString("username");
+        }
+        return userTo;
+    }
+
     @Override
     public List<String> getTransferDetails(long transferId) {
         List<String> details = new ArrayList<>();

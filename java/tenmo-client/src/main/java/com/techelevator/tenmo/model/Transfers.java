@@ -74,4 +74,20 @@ public class Transfers {
     public void setUserTo(String userTo) {
         this.userTo = userTo;
     }
+
+    @Override
+    public String toString() {
+        return "Transfers{" +
+                "transferId=" + transferId +
+                ", transferTypeId=" + transferTypeId +
+                ", transferStatusId=" + transferStatusId +
+                ", accountFrom=" + accountFrom +
+                ", accountTo=" + accountTo +
+                ", amount=" + amount +
+                ", transferType='" + transferType + '\'' +
+                ", transferStatus='" + transferStatus + '\'' +
+                ", userFrom='" + userFrom + '\'' +
+                ", userTo='" + userTo + '\'' +
+                '}';
+    }
 }

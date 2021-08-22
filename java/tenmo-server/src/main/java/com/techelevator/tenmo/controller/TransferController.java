@@ -49,6 +49,22 @@ public class TransferController {
 
     @PreAuthorize("permitAll()")
     //@PreAuthorize("hasRole('ROLE_USER')")
+    //@PreAuthorize("permitAll()")
+    @RequestMapping(path = "transfers/{transferId}/{accountFrom}", method = RequestMethod.GET)
+    public String getAccountFromUsername (@PathVariable long transferId, @PathVariable long accountFrom) {
+        return transferDAO.getUserFrom(accountFrom);
+    }
+
+    @PreAuthorize("permitAll()")
+    //@PreAuthorize("hasRole('ROLE_USER')")
+    //@PreAuthorize("permitAll()")
+    @RequestMapping(path = "transfers/{transferId}/{accountTo}", method = RequestMethod.GET)
+    public String getAccountToUsername (@PathVariable long transferId, @PathVariable long accountTo) {
+        return transferDAO.getUserTo(accountTo);
+    }
+
+    @PreAuthorize("permitAll()")
+    //@PreAuthorize("hasRole('ROLE_USER')")
     @RequestMapping(path = "transfer/{transferId}/details", method = RequestMethod.GET)
     public List<String> getTransferDetails (@PathVariable long transferId) {
         return transferDAO.getTransferDetails(transferId);

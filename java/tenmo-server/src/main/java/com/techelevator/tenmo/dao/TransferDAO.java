@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface TransferDAO {
+    String getUserFrom(long accountFrom);
+    String getUserTo(long accountTo);
     Transfers getTransferById(long transferId);
     String sendTransfer(long accountFrom, long accountTo, BigDecimal amount);
     List<Transfers> getTransferList(long userId);

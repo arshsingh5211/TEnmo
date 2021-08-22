@@ -75,7 +75,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 				// the only other option on the main menu is to exit
 				exitProgram();
 			}
-			console.menuPause();
+			//console.menuPause();
 		}
 	}
 

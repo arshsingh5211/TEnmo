@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -104,23 +105,26 @@ public class TransferService {
             transfersList = restTemplate.exchange(BASE_URL + "transfers/" + currentUser.getUser().getId() + "/all",
                                 HttpMethod.GET, makeAuthEntity(), Transfers[].class).getBody();
             System.out.println("--------------------------------------------");
-            System.out.println("ID\t\t\tFrom/To\t\t\tAmount");
+            System.out.println("ID\t\t\t\tFrom/To\t\t\t\tAmount");
             System.out.println("--------------------------------------------");
             String otherUserName = "";
             for (Transfers transfer : transfersList) {
-                System.out.println(currentUser.getUser().getUsername());
-                System.out.println(transfer.getUserFrom());
-                if (transfer.getUserFrom() == null) {
-                    otherUserName = "To " + transfer.getUserTo();
+                String userFrom = restTemplate.exchange(BASE_URL + "transfers/" + transfer.getTransferId() + "/"
+                        + transfer.getAccountFrom(), HttpMethod.GET, makeAuthEntity(), String.class).getBody();
+                String userTo = restTemplate.exchange(BASE_URL + "transfers/" + transfer.getTransferId() + "/"
+                        + transfer.getAccountTo(), HttpMethod.GET, makeAuthEntity(), String.class).getBody();
+                if (currentUser.getUser().getUsername().equals(userFrom)) {
+                    otherUserName = "To " + userTo;
                 } else {
-                    otherUserName = "From " + transfer.getUserFrom();
+                    otherUserName = "From " + userFrom;
                 }
-                System.out.println(transfer.getTransferId() + "\t\t\t" + otherUserName + "\t\t\t" +
+                System.out.println(transfer.getTransferId() + "\t\t\t" + otherUserName + "\t\t\t\t" +
                         NumberFormat.getCurrencyInstance().format(transfer.getAmount()));
             }
             System.out.println("-------");
             System.out.println("Please enter transfer ID to view details (0 to cancel): ");
             // get transfer details here
+            getTransferDetails(console.getUserInputInteger("Please enter transfer ID to view details (0 to cancel): "));
         } catch (RestClientResponseException ex) {
             // handles exceptions thrown by rest template and contains status codes
             console.printError(ex.getRawStatusCode() + " : " + ex.getStatusText());
@@ -130,6 +134,17 @@ public class TransferService {
         }
     }
 
+    private void getTransferDetails(long transferId) {
+        List<String> transferDetails = restTemplate.exchange(BASE_URL + "transfers/" + transferId + "/details",
+                HttpMethod.GET, makeAuthEntity(), List.class).getBody();
+
+        System.out.println("Transfer ID:\t\t" + transferDetails.get(0));
+        System.out.println("User From:\t\t" + transferDetails.get(1));
+        System.out.println("User To:\t\t" + transferDetails.get(2));
+        System.out.println("Transfer Type:\t\t" + transferDetails.get(3));
+        System.out.println("Transfer Status:\t\t" + transferDetails.get(4));
+        System.out.println("Transfer Amount:\t\t" + transferDetails.get(5));
+    }
     private HttpEntity<Transfers> makeTransferEntity(Transfers transfers) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON); // idk what this does?
