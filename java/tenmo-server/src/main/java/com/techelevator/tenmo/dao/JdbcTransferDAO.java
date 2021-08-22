@@ -42,7 +42,7 @@ public class JdbcTransferDAO implements TransferDAO {
     @Override
     public String sendTransfer(long userFrom, long userTo, BigDecimal amount) {
         if (userFrom == userTo) return "You cannot send a transfer to yourself!";
-        if (/*accountDAO.getBalance(userFrom).compareTo(amount) == 1 && */amount.compareTo(new BigDecimal("0.00")) == 1) {
+        if (/*accountDAO.getBalance(userFrom).compareTo(amount) == 1 &&*/ amount.compareTo(new BigDecimal("0.00")) == 1) {
             String query = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
                                 "VALUES (?, ?, ?, ?, ?) ";
             jdbcTemplate.update(query, 2, 2, userFrom, userTo, amount);
@@ -70,7 +70,8 @@ public class JdbcTransferDAO implements TransferDAO {
     }
 
     @Override
-    public String getTransferDetails(long transferId) {
+    public List<String> getTransferDetails(long transferId) {
+        List<String> details = new ArrayList<>();
         String query = "SELECT transfer_id, u.username AS from_user, v.username AS to_user, transfer_type_desc, transfer_status_desc, amount " +
         "FROM transfer_types JOIN transfers USING (transfer_type_id) JOIN transfer_statuses USING (transfer_status_id) " +
         "JOIN accounts a ON transfers.account_from = a.account_id " +
@@ -78,9 +79,16 @@ public class JdbcTransferDAO implements TransferDAO {
         "JOIN users u ON a.user_id = u.user_id " +
         "JOIN users v ON b.user_id = v.user_id " +
         "WHERE transfer_id = ?";
-
         SqlRowSet results = jdbcTemplate.queryForRowSet(query, transferId);
-        return results.toString(); // how do we get these results to client, this returns hash
+        while (results.next()) {
+            details.add(results.getString("transfer_id"));
+            details.add(results.getString("from_user"));
+            details.add(results.getString("to_user"));
+            details.add(results.getString("transfer_type_desc"));
+            details.add(results.getString("transfer_status_desc"));
+            details.add(results.getString("amount"));
+        }
+        return details;
     }
 
     @Override

@@ -40,8 +40,8 @@ public class AccountController {
         return accountDAO.getAccount(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
-    //@PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
+    //@PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
     @RequestMapping(path = "balance/{id}", method = RequestMethod.GET)
     public BigDecimal getBalance (@PathVariable int id) {
         //System.out.println(principal.getName());

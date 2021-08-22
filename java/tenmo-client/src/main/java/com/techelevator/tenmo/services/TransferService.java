@@ -89,28 +89,40 @@ public class TransferService {
                 String message = restTemplate.postForObject(BASE_URL + "transfer", makeTransferEntity(transfers),  String.class);
                 System.out.println(message);
             }
-        } catch (Exception e) { // try to change to something less generic
-           e.printStackTrace();
+        } catch (RestClientResponseException ex) {
+            // handles exceptions thrown by rest template and contains status codes
+            console.printError(ex.getRawStatusCode() + " : " + ex.getStatusText());
+        } catch (ResourceAccessException ex) {
+            // i/o error, ex: the server isn't running
+            console.printError(ex.getMessage());
         }
     }
 
     public void viewPastTransfers() {
         Transfers[] transfersList = null;
-        transfersList = restTemplate.exchange(BASE_URL + "transfers/" + currentUser.getUser().getId(),
-                            HttpMethod.GET, makeAuthEntity(), Transfers[].class).getBody();
-        System.out.println("--------------------------------------------");
-        System.out.println("ID\t\t\tFrom/To\t\t\tAmount");
-        System.out.println("--------------------------------------------");
-        String otherUserName = "";
-        for (Transfers transfer : transfersList) {
-            if (currentUser.getUser().getId() == transfer.getAccountFrom()) otherUserName = "To " + transfer.getUserTo();
-            else otherUserName = "From " + transfer.getUserFrom();
-            System.out.println(transfer.getTransferId() + "\t\t\t" + otherUserName + "\t\t\t" +
-                    NumberFormat.getCurrencyInstance().format(transfer.getAmount()));
+        try {
+            transfersList = restTemplate.exchange(BASE_URL + "transfers/" + currentUser.getUser().getId(),
+                                HttpMethod.GET, makeAuthEntity(), Transfers[].class).getBody();
+            System.out.println("--------------------------------------------");
+            System.out.println("ID\t\t\tFrom/To\t\t\tAmount");
+            System.out.println("--------------------------------------------");
+            String otherUserName = "";
+            for (Transfers transfer : transfersList) {
+                if (currentUser.getUser().getId() == transfer.getAccountFrom()) otherUserName = "To " + transfer.getUserTo();
+                else otherUserName = "From " + transfer.getUserFrom();
+                System.out.println(transfer.getTransferId() + "\t\t\t" + otherUserName + "\t\t\t" +
+                        NumberFormat.getCurrencyInstance().format(transfer.getAmount()));
+            }
+            System.out.println("-------");
+            System.out.println("Please enter transfer ID to view details (0 to cancel): ");
+            // get transfer details here
+        } catch (RestClientResponseException ex) {
+            // handles exceptions thrown by rest template and contains status codes
+            console.printError(ex.getRawStatusCode() + " : " + ex.getStatusText());
+        } catch (ResourceAccessException ex) {
+            // i/o error, ex: the server isn't running
+            console.printError(ex.getMessage());
         }
-        System.out.println("-------");
-        System.out.println("Please enter transfer ID to view details (0 to cancel): ");
-
     }
 
     private HttpEntity<Transfers> makeTransferEntity(Transfers transfers) {

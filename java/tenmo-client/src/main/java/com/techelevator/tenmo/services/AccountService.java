@@ -39,7 +39,7 @@ public class AccountService {
         } catch (ResourceAccessException ex) {
             // i/o error, ex: the server isn't running
             console.printError(ex.getMessage());
-    }
+        }
         return balance;
     }
 
