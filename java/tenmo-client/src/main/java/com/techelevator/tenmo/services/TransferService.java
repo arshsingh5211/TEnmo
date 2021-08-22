@@ -61,6 +61,7 @@ public class TransferService {
     }*/
 
     public void sendBucks() {
+        accountService = new AccountService(BASE_URL, currentUser);
         User[] users = null;//accountService.getUsers();
         Transfers transfers = new Transfers();
         try {
@@ -75,9 +76,13 @@ public class TransferService {
             }*/
             System.out.println("-----------------------------------------------------\n");
             System.out.print("Enter ID of user you are sending to (0 to cancel): ");
-            long toAccountId = Long.parseLong(in.nextLine());
+            Account account = accountService.getAccountByUserId(Long.parseLong(in.nextLine()));
+            System.out.println(account);
+            long toAccountId = account.getAccountId(); //Long.parseLong(in.nextLine());
             transfers.setAccountTo(toAccountId);
-            transfers.setAccountFrom(currentUser.getUser().getId());
+            System.out.println(accountService.getAccountByUserId(currentUser.getUser().getId()).getAccountId());
+            System.out.println("--");
+            transfers.setAccountFrom(accountService.getAccountByUserId(currentUser.getUser().getId()).getAccountId());
             if (toAccountId != 0) {
                 System.out.print("Enter amount: ");
                 try {

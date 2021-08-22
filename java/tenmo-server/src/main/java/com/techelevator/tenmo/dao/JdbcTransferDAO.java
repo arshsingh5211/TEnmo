@@ -81,6 +81,7 @@ public class JdbcTransferDAO implements TransferDAO {
         }
         return userFrom;
     }
+
     @Override
     public String getUserTo(long accountTo) {
         String userTo = "";
