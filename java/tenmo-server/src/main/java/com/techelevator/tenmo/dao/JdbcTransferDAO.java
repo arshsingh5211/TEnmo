@@ -69,6 +69,7 @@ public class JdbcTransferDAO implements TransferDAO {
         return transfersList;
     }
 
+    @Override
     public String getUserFrom(long accountFrom) {
         String userFrom = "";
         String query = "SELECT username FROM users " +
@@ -80,6 +81,7 @@ public class JdbcTransferDAO implements TransferDAO {
         }
         return userFrom;
     }
+    @Override
     public String getUserTo(long accountTo) {
         String userTo = "";
         String query = "SELECT username FROM users " +

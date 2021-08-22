@@ -68,6 +68,13 @@ public class ConsoleService {
 		return in.nextLine();
 	}
 
+	public long getUserInputReturnLong(String prompt) {
+		out.print(prompt+": ");
+		out.flush();
+		String inputStr = in.nextLine();
+		return Long.parseLong(inputStr);
+	}
+
 	public Integer getUserInputInteger(String prompt) {
 		Integer result = null;
 		do {
