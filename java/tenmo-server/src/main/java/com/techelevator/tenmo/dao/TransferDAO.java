@@ -12,5 +12,4 @@ public interface TransferDAO {
     List<Transfers> getTransferList(long userId);
     String getTransferDetails(long transferId);
     String updateTransferRequest(Transfers transfer, long statusId);
-    List<Transfers> searchAllTransfersById(); // current user plus whatever id we pass in (interactions)
 }

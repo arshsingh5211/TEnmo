@@ -44,8 +44,8 @@ public class JdbcTransferDAO implements TransferDAO {
         if (userFrom == userTo) return "You cannot send a transfer to yourself!";
         if (/*accountDAO.getBalance(userFrom).compareTo(amount) == 1 && */amount.compareTo(new BigDecimal("0.00")) == 1) {
             String query = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
-                                "VALUES (2, 2, ?, ?, ?) ";
-            jdbcTemplate.update(query, userFrom, userTo, amount);
+                                "VALUES (?, ?, ?, ?, ?) ";
+            jdbcTemplate.update(query, 2, 2, userFrom, userTo, amount);
             accountDAO.addToBalance(userTo, amount);
             accountDAO.subtractFromBalance(userFrom, amount);
            return "Transfer successful!"; // show current user's new balance
@@ -81,11 +81,6 @@ public class JdbcTransferDAO implements TransferDAO {
 
         SqlRowSet results = jdbcTemplate.queryForRowSet(query, transferId);
         return results.toString(); // how do we get these results to client, this returns hash
-    }
-
-    @Override
-    public List<Transfers> searchAllTransfersById() {
-        return null;
     }
 
     @Override

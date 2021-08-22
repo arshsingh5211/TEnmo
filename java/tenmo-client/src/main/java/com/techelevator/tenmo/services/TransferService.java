@@ -6,10 +6,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -72,32 +74,43 @@ public class TransferService {
             }*/
             System.out.println("-----------------------------------------------------\n");
             System.out.print("Enter ID of user you are sending to (0 to cancel): ");
-            long toAccountUserId = Long.parseLong(in.nextLine());
-            transfers.setAccountTo(1002);//accountService.getAccountByUserId(toAccountUserId).getAccountId());
-            transfers.setAccountFrom(1004);//accountService.getAccountByUserId(currentUser.getUser().getId()).getAccountId());
-            if (toAccountUserId != 0) {
+            long toAccountId = Long.parseLong(in.nextLine());
+            transfers.setAccountTo(toAccountId);
+            transfers.setAccountFrom(currentUser.getUser().getId());
+            if (toAccountId != 0) {
                 System.out.print("Enter amount: ");
-                BigDecimal amount;
                 try {
-                    double amountDbl = Double.parseDouble(in.next());
-                    amount = BigDecimal.valueOf(amountDbl);
-                    transfers.setAmount(amount);
+                    transfers.setAmount(new BigDecimal(Double.parseDouble(in.next())));
                 } catch (NumberFormatException e) {
                     System.out.println("Sorry, that is not a valid amount!");
                 }
-
-                //BigDecimal amountToTransfer = console.promptForAmount();
-
-                try {
-                    String transferString = restTemplate.exchange(BASE_URL + "transfers", HttpMethod.POST, makeTransferEntity(transfers), String.class).getBody();
-                    System.out.println(transferString);
-                } catch (RestClientResponseException ex) {
-                    ex.printStackTrace();
-                }
+                /*String message = restTemplate.exchange(BASE_URL + "transfer", HttpMethod.POST, makeTransferEntity(transfers), String.class).getBody();
+                System.out.println(message);*/
+                String message = restTemplate.postForObject(BASE_URL + "transfer", makeTransferEntity(transfers),  String.class);
+                System.out.println(message);
             }
         } catch (Exception e) { // try to change to something less generic
            e.printStackTrace();
         }
+    }
+
+    public void viewPastTransfers() {
+        Transfers[] transfersList = null;
+        transfersList = restTemplate.exchange(BASE_URL + "transfers/" + currentUser.getUser().getId(),
+                            HttpMethod.GET, makeAuthEntity(), Transfers[].class).getBody();
+        System.out.println("--------------------------------------------");
+        System.out.println("ID\t\t\tFrom/To\t\t\tAmount");
+        System.out.println("--------------------------------------------");
+        String otherUserName = "";
+        for (Transfers transfer : transfersList) {
+            if (currentUser.getUser().getId() == transfer.getAccountFrom()) otherUserName = "To " + transfer.getUserTo();
+            else otherUserName = "From " + transfer.getUserFrom();
+            System.out.println(transfer.getTransferId() + "\t\t\t" + otherUserName + "\t\t\t" +
+                    NumberFormat.getCurrencyInstance().format(transfer.getAmount()));
+        }
+        System.out.println("-------");
+        System.out.println("Please enter transfer ID to view details (0 to cancel): ");
+
     }
 
     private HttpEntity<Transfers> makeTransferEntity(Transfers transfers) {

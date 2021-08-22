@@ -4,8 +4,11 @@ import com.techelevator.tenmo.dao.TransferDAO;
 import com.techelevator.tenmo.dao.UserDao;
 import com.techelevator.tenmo.model.Transfers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -21,17 +24,18 @@ public class TransferController {
         this.userDao = userDao;
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
-    //@PreAuthorize("permitAll()")
+    //@PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("permitAll()")
     @RequestMapping(path = "transfers/{id}/all", method = RequestMethod.GET)
     public List<Transfers> getAllTransfers(@PathVariable long id) {
         return transferDAO.getTransferList(id);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
-    //@PreAuthorize("permitAll()")
+    @ResponseStatus(HttpStatus.CREATED)
+    //@PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("permitAll()")
     @RequestMapping(path = "transfer", method = RequestMethod.POST)
-    public String sendTransfer(@RequestBody Transfers transfers) {
+    public String sendTransfer(@Valid @RequestBody Transfers transfers) {
         return transferDAO.sendTransfer(transfers.getAccountFrom(), transfers.getAccountTo(), transfers.getAmount());
     }
 

@@ -147,5 +147,11 @@ public class ConsoleService {
 		System.err.println(errorMessage);
 	}
 
+	/*public void printTransferList() {
+		System.out.println("--------------------------------------------");
+		System.out.println("ID\t\t\tFrom/To\t\t\tAmount");
+		System.out.println("--------------------------------------------");
+	}
+*/
 
 }

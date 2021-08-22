@@ -89,8 +89,8 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 	}
 
 	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
-		
+    	transferService = new TransferService(API_BASE_URL, currentUser);
+		transferService.viewPastTransfers();
 	}
 
 	private void viewPendingRequests() {
@@ -106,8 +106,12 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 		String newTransferString = console.promptForTransfer();
 		Transfers transfer = transferService.addTransfer(newTransferString);
 		if (transfer == null) System.out.println("Invalid transfer. Please try again.");*/
-		transferService = new TransferService(API_BASE_URL, currentUser);
-		transferService.sendBucks();
+		try {
+			transferService = new TransferService(API_BASE_URL, currentUser);
+			transferService.sendBucks();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void requestBucks() {
