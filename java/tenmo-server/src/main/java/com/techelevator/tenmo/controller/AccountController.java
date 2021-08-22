@@ -26,8 +26,8 @@ public class AccountController {
         this.accountDAO = accountDAO;
         this.userDao = userDao;
     }
-    @PreAuthorize("hasRole('ROLE_USER')")
-    //@PreAuthorize("permitAll()")
+    //@PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("permitAll()")
     @RequestMapping(path = "all_accounts", method = RequestMethod.GET)
     public List<Account> getAllAccounts() {
         return accountDAO.getAllAccounts();

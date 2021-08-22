@@ -20,6 +20,11 @@ public class ConsoleService {
 		this.in = new Scanner(input);
 	}
 
+	public void menuPause() {
+		System.out.println("Press 'ENTER' to continue.");
+		in.nextLine();
+	}
+
 	public Object getChoiceFromOptions(Object[] options) {
 		Object choice = null;
 		while (choice == null) {

@@ -75,6 +75,7 @@ private static final String API_BASE_URL = "http://localhost:8080/";
 				// the only other option on the main menu is to exit
 				exitProgram();
 			}
+			console.menuPause();
 		}
 	}
 
@@ -177,7 +178,8 @@ private static final String API_BASE_URL = "http://localhost:8080/";
             	System.out.println("REGISTRATION ERROR: "+e.getMessage());
 				System.out.println("Please attempt to register again.");
             }
-        }
+			console.menuPause();
+		}
 	}
 
 	private void login() {

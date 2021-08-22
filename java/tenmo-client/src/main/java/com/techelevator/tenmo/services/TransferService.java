@@ -80,13 +80,13 @@ public class TransferService {
             if (toAccountId != 0) {
                 System.out.print("Enter amount: ");
                 try {
-                    transfers.setAmount(new BigDecimal(Double.parseDouble(in.next())));
+                    transfers.setAmount(BigDecimal.valueOf(Double.parseDouble(in.next())));
                 } catch (NumberFormatException e) {
                     System.out.println("Sorry, that is not a valid amount!");
                 }
-                /*String message = restTemplate.exchange(BASE_URL + "transfer", HttpMethod.POST, makeTransferEntity(transfers), String.class).getBody();
-                System.out.println(message);*/
-                String message = restTemplate.postForObject(BASE_URL + "transfer", makeTransferEntity(transfers),  String.class);
+                String message = restTemplate.exchange(BASE_URL + "transfer", HttpMethod.POST, makeTransferEntity(transfers), String.class).getBody();
+                /*System.out.println(message);*/
+                //String message = restTemplate.postForObject(BASE_URL + "transfer", makeTransferEntity(transfers), String.class);
                 System.out.println(message);
             }
         } catch (RestClientResponseException ex) {
@@ -101,15 +101,20 @@ public class TransferService {
     public void viewPastTransfers() {
         Transfers[] transfersList = null;
         try {
-            transfersList = restTemplate.exchange(BASE_URL + "transfers/" + currentUser.getUser().getId(),
+            transfersList = restTemplate.exchange(BASE_URL + "transfers/" + currentUser.getUser().getId() + "/all",
                                 HttpMethod.GET, makeAuthEntity(), Transfers[].class).getBody();
             System.out.println("--------------------------------------------");
             System.out.println("ID\t\t\tFrom/To\t\t\tAmount");
             System.out.println("--------------------------------------------");
             String otherUserName = "";
             for (Transfers transfer : transfersList) {
-                if (currentUser.getUser().getId() == transfer.getAccountFrom()) otherUserName = "To " + transfer.getUserTo();
-                else otherUserName = "From " + transfer.getUserFrom();
+                System.out.println(currentUser.getUser().getUsername());
+                System.out.println(transfer.getUserFrom());
+                if (transfer.getUserFrom() == null) {
+                    otherUserName = "To " + transfer.getUserTo();
+                } else {
+                    otherUserName = "From " + transfer.getUserFrom();
+                }
                 System.out.println(transfer.getTransferId() + "\t\t\t" + otherUserName + "\t\t\t" +
                         NumberFormat.getCurrencyInstance().format(transfer.getAmount()));
             }
