@@ -39,7 +39,8 @@ public class TransferService {
 
             System.out.println("-----------------------------------------------------\n");
             long input = 1L;
-            while (true) {
+            boolean run = true;
+            while (run) {
                 try {
                     System.out.print("Enter ID of user you are sending to (0 to cancel): ");
                     input = Long.parseLong(in.nextLine());
@@ -55,6 +56,7 @@ public class TransferService {
                     }
                     String message = restTemplate.exchange(BASE_URL + "transfer", HttpMethod.POST, makeTransferEntity(transfers), String.class).getBody();
                     System.out.println(message);
+                    run = false;
                 } catch (NullPointerException NPException) {
                     if (input == 0) {
                         break;
@@ -129,7 +131,7 @@ public class TransferService {
                 System.out.println("User To:\t\t\t" + transferDetails.get(2));
                 System.out.println("Transfer Type:\t\t" + transferDetails.get(3));
                 System.out.println("Transfer Status:\t" + transferDetails.get(4));
-                System.out.println("Transfer Amount:\t" + transferDetails.get(5));
+                System.out.println("Transfer Amount:\t" + NumberFormat.getCurrencyInstance().format(transferDetails.get(5)));
             }
             return true;
         } catch (Exception ex) {

@@ -26,29 +26,25 @@ public class AccountController {
         this.accountDAO = accountDAO;
         this.userDao = userDao;
     }
-    //@PreAuthorize("hasRole('ROLE_USER')")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CREATOR')")
     @RequestMapping(path = "all_accounts", method = RequestMethod.GET)
     public List<Account> getAllAccounts() {
         return accountDAO.getAllAccounts();
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    //@PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
     @RequestMapping(path = "account/{id}", method = RequestMethod.GET)
     public Account getAccount (@PathVariable long id) {
         return accountDAO.getAccount(id);
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    //@PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
     @RequestMapping(path = "account/user{id}", method = RequestMethod.GET)
     public Account getAccountByUserId (@PathVariable long id) {
         return accountDAO.getAccountByUserId(id);
     }
 
-    //@PreAuthorize("hasRole('ROLE_USER')")
-    @PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
+    @PreAuthorize("permitAll()")
     @RequestMapping(path = "balance/{id}", method = RequestMethod.GET)
     public BigDecimal getBalance (@PathVariable int id) {
         //System.out.println(principal.getName());
