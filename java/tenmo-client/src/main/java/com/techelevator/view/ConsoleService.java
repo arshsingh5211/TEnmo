@@ -99,71 +99,15 @@ public class ConsoleService {
 		}
 	}
 
-	public String promptForUser() {
-		return promptForUser(null);
-	}
-
-	public String promptForUser(User user) {
-		String userString;
-		System.out.println("--------------------------------------------");
-		System.out.println("Enter ID of user you are sending TE bucks to (0 to cancel):");
-		if (user != null) System.out.println(user);
-		System.out.println("--------------------------------------------");
-		System.out.println("");
-		userString = in.nextLine();
-		if (user != null) userString = user.getId() + ", " + userString;
-
-		return userString;
-	}
-
-	public BigDecimal promptForAmount() {
-		BigDecimal amount = new BigDecimal("0.00");
-		System.out.println("--------------------------------------------");
-		System.out.println("Enter amount: ");
-		System.out.println("--------------------------------------------");
-		System.out.println("");
-
-		try {
-			amount = in.nextBigDecimal();
-		} catch (NumberFormatException e) {
-			System.out.println("Sorry, that is not a valid amount!");
-		}
-		return amount;
-	}
-
-
-	public String promptForTransfer() {
-		return promptForTransfer(null);
-	}
-
-	public String promptForTransfer(Transfers transfers) {
-		String transferString;
-		System.out.println("--------------------------------------------");
-		System.out.println("Enter amount: ");
-		if (transfers != null) {
-			System.out.println(transfers.toString());
-		} else {
-			System.out.println("Example: JoeShmoe, 25.00");
-		}
-		System.out.println("--------------------------------------------");
-		System.out.println("");
-
-		transferString = in.nextLine();
-		if (transfers != null) {
-			transferString = transfers.getTransferId() + "," + transferString;
-		}
-		return transferString;
+	public void printTransferHeaders() {
+		System.out.println("----------------------------------------------------");
+		System.out.println("ID\t\t\t\t\tFrom/To\t\t\t\t\tAmount");
+		System.out.println("----------------------------------------------------");
 	}
 
 	public void printError(String errorMessage) {
 		System.err.println(errorMessage);
 	}
 
-	/*public void printTransferList() {
-		System.out.println("--------------------------------------------");
-		System.out.println("ID\t\t\tFrom/To\t\t\tAmount");
-		System.out.println("--------------------------------------------");
-	}
-*/
 
 }

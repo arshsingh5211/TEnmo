@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface AccountDAO {
+    Account getAccountByUserId (long id);
     Account getAccount(long id);
     Account getAccount(String username); //left both getAccounts as not sure which we want to use yet
     List<Account> getAllAccounts();

@@ -40,6 +40,13 @@ public class AccountController {
         return accountDAO.getAccount(id);
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
+    //@PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
+    @RequestMapping(path = "account/user{id}", method = RequestMethod.GET)
+    public Account getAccountByUserId (@PathVariable long id) {
+        return accountDAO.getAccountByUserId(id);
+    }
+
     //@PreAuthorize("hasRole('ROLE_USER')")
     @PreAuthorize("permitAll()")  // just bypassed authorization stuff for now ***FIX LATER
     @RequestMapping(path = "balance/{id}", method = RequestMethod.GET)

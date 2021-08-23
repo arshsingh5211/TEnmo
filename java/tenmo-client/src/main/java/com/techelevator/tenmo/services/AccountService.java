@@ -76,7 +76,7 @@ public class AccountService {
     public Account getAccountByUserId(long id) {
         Account account = null;
         try {
-            account = restTemplate.getForObject(BASE_URL + "account/" + id, Account.class);
+            account = restTemplate.exchange(BASE_URL + "account/user" + id, HttpMethod.GET, makeAuthEntity(), Account.class).getBody();
         } catch (RestClientResponseException ex) {
             // handles exceptions thrown by rest template and contains status codes
             console.printError(ex.getRawStatusCode() + " : " + ex.getStatusText());
