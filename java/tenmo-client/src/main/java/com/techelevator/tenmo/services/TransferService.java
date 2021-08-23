@@ -98,18 +98,19 @@ public class TransferService {
             System.out.println("-------");
             // get transfer details here
             boolean details = false;
+            String errorMessage = "Invalid Transfer Id. Please choose from the options above.";
             while (!details) {
                 long input = 1L;
                 try {
-                    input = console.getUserInputReturnLong("Please enter transfer ID to view details (0 to cancel): ");
+                    input = console.getUserInputReturnLong("Please enter transfer ID to view details (0 to cancel)");
                     details = getTransferDetails(input);
                 } catch (NullPointerException NPException) {
                     if (input == 0) {
                         break;
                     }
-                    System.out.println("Invalid Transfer Id. Please choose from the options above");
+                    System.out.println(errorMessage);
                 } catch (NumberFormatException NFException) {
-                    System.out.println("Invalid Transfer Id. Please choose from the options above.");
+                    System.out.println(errorMessage);
                 }
             }
         } catch (RestClientResponseException ex) {
@@ -142,7 +143,7 @@ public class TransferService {
 
     private HttpEntity<Transfers> makeTransferEntity(Transfers transfers) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON); // idk what this does?
+        headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(currentUser.getToken());
         HttpEntity<Transfers> entity = new HttpEntity<>(transfers, headers);
         return entity;

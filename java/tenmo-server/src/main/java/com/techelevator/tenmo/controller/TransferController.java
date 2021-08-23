@@ -24,56 +24,42 @@ public class TransferController {
         this.userDao = userDao;
     }
 
-    //@PreAuthorize("hasRole('ROLE_USER')")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @RequestMapping(path = "transfers/{id}/all", method = RequestMethod.GET)
     public List<Transfers> getAllTransfers(@PathVariable long id) {
         return transferDAO.getTransferList(id);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
-    //@PreAuthorize("hasRole('ROLE_USER')")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @RequestMapping(path = "transfer", method = RequestMethod.POST)
     public String sendTransfer(@Valid @RequestBody Transfers transfers) {
         return transferDAO.sendTransfer(transfers.getAccountFrom(), transfers.getAccountTo(), transfers.getAmount());
     }
 
-    @PreAuthorize("permitAll()")
-    //@PreAuthorize("hasRole('ROLE_USER')")
-    //@PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @RequestMapping(path = "transfer/{transferId}", method = RequestMethod.GET)
     public Transfers getTransferByTransferId (@PathVariable long transferId) {
         return transferDAO.getTransferById(transferId);
     }
 
-    @PreAuthorize("permitAll()")
-    //@PreAuthorize("hasRole('ROLE_USER')")
-    //@PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @RequestMapping(path = "transfers/{transferId}/from{accountFrom}", method = RequestMethod.GET)
     public String getAccountFromUsername (@PathVariable long transferId, @PathVariable long accountFrom) {
         return transferDAO.getUserFrom(accountFrom);
     }
 
 
-    @PreAuthorize("permitAll()")
-    //@PreAuthorize("hasRole('ROLE_USER')")
-    //@PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @RequestMapping(path = "transfers/{transferId}/to{accountTo}", method = RequestMethod.GET)
     public String getAccountToUsername (@PathVariable long transferId, @PathVariable long accountTo) {
         return transferDAO.getUserTo(accountTo);
     }
 
-    @PreAuthorize("permitAll()")
-    //@PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @RequestMapping(path = "transfer/{transferId}/details", method = RequestMethod.GET)
     public List<String> getTransferDetails (@PathVariable long transferId) {
         return transferDAO.getTransferDetails(transferId);
     }
 
-    @PreAuthorize("permitAll()")
-    @RequestMapping(path = "transfer/status/{statusId}", method = RequestMethod.PUT)
-    public String updateRequest(@RequestBody Transfers transfer, @PathVariable long statusId) {
-        return transferDAO.updateTransferRequest(transfer, statusId);
-    }
 }

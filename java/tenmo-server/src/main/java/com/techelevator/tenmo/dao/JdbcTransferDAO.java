@@ -120,22 +120,6 @@ public class JdbcTransferDAO implements TransferDAO {
         return details;
     }
 
-    @Override
-    public String updateTransferRequest(Transfers transfer, long statusId) {
-        if (statusId == 3) {
-            String sql = "UPDATE transfers SET transfer_status_id = ? WHERE transfer_id = ?;";
-            jdbcTemplate.update(sql, statusId, transfer.getTransferId());
-            return "Request updated!";
-        }
-        if (accountDAO.getBalance(transfer.getAccountFrom()).compareTo(transfer.getAmount()) != -1) {
-            String sql = "UPDATE transfers SET transfer_status_id = ? WHERE transfer_id = ?;";
-            jdbcTemplate.update(sql, statusId, transfer.getTransferId());
-            accountDAO.addToBalance(transfer.getAccountTo(), transfer.getAmount());
-            accountDAO.subtractFromBalance(transfer.getAccountFrom(), transfer.getAmount());
-            return "Update successful!";
-        }
-        else return "Sorry, transfer unable to be completed at this time!";
-    }
 
     private Transfers mapRowToTransfer(SqlRowSet rowSet) {
         Transfers transfers = new Transfers();

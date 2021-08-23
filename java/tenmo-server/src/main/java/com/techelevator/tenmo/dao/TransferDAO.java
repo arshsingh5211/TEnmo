@@ -13,5 +13,4 @@ public interface TransferDAO {
     String sendTransfer(long accountFrom, long accountTo, BigDecimal amount);
     List<Transfers> getTransferList(long userId);
     List<String> getTransferDetails(long transferId);
-    String updateTransferRequest(Transfers transfer, long statusId);
 }
