@@ -44,10 +44,9 @@ public class AccountController {
         return accountDAO.getAccountByUserId(id);
     }
 
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ROLE_USER')")
     @RequestMapping(path = "balance/{id}", method = RequestMethod.GET)
     public BigDecimal getBalance (@PathVariable int id) {
-        //System.out.println(principal.getName());
         return accountDAO.getBalance(id);
     }
 

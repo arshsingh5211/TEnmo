@@ -123,7 +123,7 @@ public class TransferService {
 
     private boolean getTransferDetails(long transferId) {
         try {
-            List transferDetails = restTemplate.exchange(BASE_URL + "transfer/" + transferId + "/details",
+            List<?> transferDetails = restTemplate.exchange(BASE_URL + "transfer/" + transferId + "/details",
                     HttpMethod.GET, makeAuthEntity(), List.class).getBody();
             if (transferId != 0) {
                 System.out.println("Transfer ID:\t\t" + transferDetails.get(0));
@@ -131,7 +131,8 @@ public class TransferService {
                 System.out.println("User To:\t\t\t" + transferDetails.get(2));
                 System.out.println("Transfer Type:\t\t" + transferDetails.get(3));
                 System.out.println("Transfer Status:\t" + transferDetails.get(4));
-                System.out.println("Transfer Amount:\t" + NumberFormat.getCurrencyInstance().format(transferDetails.get(5)));
+                System.out.println("Transfer Amount:\t" + NumberFormat.getCurrencyInstance().format
+                        (new BigDecimal(transferDetails.get(5).toString())));
             }
             return true;
         } catch (Exception ex) {
