@@ -43,36 +43,6 @@ public class AccountService {
         return balance;
     }
 
-    public User[] getUsers() {
-        User[] userList = null;
-        try {
-            /*userList = restTemplate.exchange(BASE_URL + "users", HttpMethod.GET, makeAuthEntity(),
-                    User[].class).getBody();*/
-            userList = restTemplate.getForObject(BASE_URL + "users", User[].class);
-        } catch (RestClientResponseException ex) {
-            // handles exceptions thrown by rest template and contains status codes
-            console.printError(ex.getRawStatusCode() + " : " + ex.getStatusText());
-        } catch (ResourceAccessException ex) {
-            // i/o error, ex: the server isn't running
-            console.printError(ex.getMessage());
-        }
-        return userList;
-    }
-
-    public User getUserByUsername(String username) {
-        User user = null;
-        try {
-            user = restTemplate.getForObject(BASE_URL + "users/" + username, User.class);
-        } catch (RestClientResponseException ex) {
-            // handles exceptions thrown by rest template and contains status codes
-            console.printError(ex.getRawStatusCode() + " : " + ex.getStatusText());
-        } catch (ResourceAccessException ex) {
-            // i/o error, ex: the server isn't running
-            console.printError(ex.getMessage());
-        }
-        return user;
-    }
-
     public Account getAccountByUserId(long id) {
         Account account = null;
         try {

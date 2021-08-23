@@ -69,8 +69,6 @@ public class JDBCAccountDAO implements AccountDAO {
         jdbcTemplate.update(query, newBalance, accountId);
         return account.getBalance();
     }
-    // ********should we combine these into one updateBalance()?*************
-
 
     @Override
     public void deleteAccount(long id) {
