@@ -63,7 +63,6 @@ public class JdbcUserDao implements UserDao {
         } catch (DataAccessException e) {
             return false;
         }
-
         // create account
         sql = "INSERT INTO accounts (user_id, balance) values(?, ?)";
         try {
@@ -71,7 +70,6 @@ public class JdbcUserDao implements UserDao {
         } catch (DataAccessException e) {
             return false;
         }
-
         return true;
     }
 

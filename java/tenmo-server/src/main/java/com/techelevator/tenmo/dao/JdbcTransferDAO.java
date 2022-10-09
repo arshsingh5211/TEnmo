@@ -43,7 +43,7 @@ public class JdbcTransferDAO implements TransferDAO {
     @Override
     public String sendTransfer(long userFrom, long userTo, BigDecimal amount) {
         if (userFrom == userTo) return "You cannot send a transfer to yourself!";
-        Account account = accountDAO.getAccount(userFrom);
+        Account account = accountDAO.getAccountByAccountId(userFrom);
 
         if (account.getBalance().compareTo(amount) == 1 && amount.compareTo(new BigDecimal("0.00")) == 1) {
             String query = "INSERT INTO transfers (transfer_type_id, transfer_status_id, account_from, account_to, amount) " +
