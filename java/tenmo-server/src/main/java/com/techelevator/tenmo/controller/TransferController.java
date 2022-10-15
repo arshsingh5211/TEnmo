@@ -30,6 +30,7 @@ public class TransferController {
         return transferDAO.getTransferList(id);
     }
 
+    // TODO: 10/15/22 need to fix so you cant be logged in as one user and pay from a different user to yourself (or others)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_USER')")
     @RequestMapping(path = "transfer", method = RequestMethod.POST)
