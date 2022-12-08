@@ -1,7 +1,9 @@
 package com.techelevator.tenmo.controller;
 
+import com.techelevator.tenmo.dao.AccountDAO;
 import com.techelevator.tenmo.dao.TransferDAO;
 import com.techelevator.tenmo.dao.UserDao;
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.Transfers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -18,6 +21,8 @@ public class TransferController {
     TransferDAO transferDAO;
     @Autowired
     UserDao userDao;
+    @Autowired
+    AccountDAO accountDAO;
 
     public TransferController(TransferDAO transferDAO, UserDao userDao) {
         this.transferDAO = transferDAO;
@@ -30,12 +35,18 @@ public class TransferController {
         return transferDAO.getTransferList(id);
     }
 
+    // TODO: 10/15/22 need to fix so you cant be logged in as one user and pay from a different user to yourself (or others)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_USER')")
     @RequestMapping(path = "transfer", method = RequestMethod.POST)
-    public String sendTransfer(@Valid @RequestBody Transfers transfers) {
+    public String sendTransfer(@Valid @RequestBody Transfers transfers, Principal principal) {
+        Account currentUserAccount = accountDAO.getAccountByUserId(userDao.findIdByUsername(principal.getName()));
+        if (transfers.getAccountFrom() != currentUserAccount.getAccountId()) {
+            return "Sorry, you cannot send money from an account that is not yours!";
+        }
         return transferDAO.sendTransfer(transfers.getAccountFrom(), transfers.getAccountTo(), transfers.getAmount());
     }
+    // this solution sucks and needs refactoring
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @RequestMapping(path = "transfer/{transferId}", method = RequestMethod.GET)

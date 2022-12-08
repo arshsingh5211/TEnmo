@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface AccountDAO {
     Account getAccountByUserId (long id);
-    Account getAccount(long id);
-    Account getAccount(String username); //left both getAccounts as not sure which we want to use yet
+    Account getAccountByAccountId(long id);
+//    Account getAccount(String username); //left both getAccounts as not sure which we want to use yet
     List<Account> getAllAccounts();
     BigDecimal getBalance(long id);
     BigDecimal addToBalance(long accountId, BigDecimal amountToAdd);

@@ -24,14 +24,16 @@ public class JDBCAccountDAO implements AccountDAO {
         BigDecimal balance = null;
         String query = "SELECT balance FROM accounts WHERE user_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(query, id);
-        if ((results.next())) {
+        while (results.next()) {
             balance = results.getBigDecimal("balance");
         }
         return balance;
     }
 
+    // test above works even if user has multiple accounts (SUM() does not work here for some reason)
+
     @Override
-    public Account getAccount (long id) {
+    public Account getAccountByAccountId (long id) {
         Account account = null;
         String query = "SELECT * FROM accounts WHERE account_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(query, id);
@@ -54,7 +56,7 @@ public class JDBCAccountDAO implements AccountDAO {
 
     @Override
     public BigDecimal addToBalance(long accountId, BigDecimal amountToAdd) {
-        Account account = getAccount(accountId);
+        Account account = getAccountByAccountId(accountId);
         BigDecimal newBalance = account.getBalance().add(amountToAdd);
         String query = "UPDATE accounts SET balance = ? WHERE account_id = ?";
         jdbcTemplate.update(query, newBalance, accountId);
@@ -63,7 +65,7 @@ public class JDBCAccountDAO implements AccountDAO {
 
     @Override
     public BigDecimal subtractFromBalance(long accountId, BigDecimal amountToSubtract) {
-        Account account = getAccount(accountId);
+        Account account = getAccountByAccountId(accountId);
         BigDecimal newBalance = account.getBalance().subtract(amountToSubtract);
         String query = "UPDATE accounts SET balance = ? WHERE account_id = ?";
         jdbcTemplate.update(query, newBalance, accountId);
@@ -76,7 +78,7 @@ public class JDBCAccountDAO implements AccountDAO {
         jdbcTemplate.update(query, id);
     }
 
-   @Override
+/*   @Override
     public Account getAccount(String username) { // or we can use userId too (probably better?)
         Account account = new Account();
         String query = "SELECT * FROM accounts WHERE (SELECT user_id FROM accounts " +
@@ -86,7 +88,7 @@ public class JDBCAccountDAO implements AccountDAO {
             account = mapRowToAccount(results);
         }
         return account;
-    }
+    }*/
 
     @Override
     public List<Account> getAllAccounts() {
